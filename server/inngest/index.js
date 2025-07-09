@@ -7,8 +7,9 @@ dotenv.config()
 const inngest = new Inngest({
   id: "movie-ticket-booking",
   eventKey: process.env.INNGEST_EVENT_KEY,
-  signingKey: process.env.INNGEST_SIGNIN_KEY, // ✅ critical
+  signingKey: process.env.INNGEST_SIGNING_KEY, 
 });
+
 
 
 // Inngest function to create user :

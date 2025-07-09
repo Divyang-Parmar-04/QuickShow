@@ -2,7 +2,11 @@ const { Inngest } = require('inngest');
 const USER = require('../models/userModel');
 
 // Create a client to send and receive events
-const inngest = new Inngest({ id: "movie-ticket-booking" });
+const inngest = new Inngest({
+  id: "movie-ticket-booking",
+  eventKey: process.env.INNGEST_EVENT_KEY,
+  signingKey: process.env.INNGEST_SIGNIN_KEY, // ✅ critical
+});
 
 
 // Inngest function to create user :

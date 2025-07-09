@@ -1,5 +1,7 @@
 const { Inngest } = require('inngest');
 const USER = require('../models/userModel');
+const dotenv = require('dotenv')
+dotenv.config()
 
 // Create a client to send and receive events
 const inngest = new Inngest({

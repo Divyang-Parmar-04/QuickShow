@@ -5,7 +5,10 @@ const { clerkMiddleware } = require('@clerk/express')
 const { serve } = require("inngest/express");
 
 const { inngest, functions } = require('./inngest/index.js')
-const connectDB = require('./configs/db.js')
+const connectDB = require('./configs/db.js');
+const staticRoutes = require('./router/staticRoute.js')
+const postRoutes = require('./router/postRoutes.js')
+const protectAdmin = require('./auth/auth.js')
 
 const app = express()
 const PORT = 5000;
@@ -16,7 +19,11 @@ connectDB()
 // Middleware
 app.use(express.json())
 app.use(cors())
+dotenv.config()
 app.use(clerkMiddleware())
+app.use('/',staticRoutes)
+app.use('/',postRoutes)
+
 
 // API Routes
 app.get("/", (req, res) => res.send('Server is Started'))

@@ -19,7 +19,7 @@ const PORT = 5000;
 connectDB();
 
 // STRIPE Webhook FIRST before express.json()
-app.post('/api/stripe', express.raw({ type: 'application/json' }), stripeWebHooks);
+app.use('/api/stripe', express.raw({ type: 'application/json' }), stripeWebHooks);
 
 // All other middlewares AFTER webhook route
 app.use(cors());

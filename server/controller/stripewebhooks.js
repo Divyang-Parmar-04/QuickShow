@@ -15,41 +15,34 @@ const stripeWebHooks = async (req, res) => {
       process.env.STRIPE_WEBHOOK_SECRET_KEY
     );
   } catch (error) {
-    console.error("Webhook signature verification failed:", error.message);
     return res.status(400).send(`Webhook Error: ${error.message}`);
   }
 
   try {
-    switch (event.type) {
-      case "checkout.session.completed": {
-        const session = event.data.object;
+    // ✅ Use this event
+    if (event.type === "checkout.session.completed") {
+      const session = event.data.object;
 
-        // Make sure metadata and bookingId exist
-        const bookingId = session.metadata?.bookingId;
-        if (!bookingId) {
-          console.error("No bookingId found in session metadata");
-          break;
-        }
-
-        // Update booking: mark as paid, remove payment link
-        await BOOKING.findByIdAndUpdate(bookingId, {
-          isPaid: true,
-          paymentLink: ""
-        });
-
-        console.log("✅ Booking marked as paid for ID:", bookingId);
-        break;
+      const { bookingId } = session.metadata;
+      if (!bookingId) {
+        console.warn("bookingId not found in metadata");
+        return res.status(400).send("Missing booking ID in metadata");
       }
 
-      default:
-        console.log("Unhandled event type:", event.type);
-        break;
+      await BOOKING.findByIdAndUpdate(bookingId, {
+        isPaid: true,
+        paymentLink: ""
+      });
+
+      console.log("Booking updated:", bookingId);
+    } else {
+      console.log("Unhandled event type:", event.type);
     }
 
     res.json({ received: true });
   } catch (err) {
-    console.error("Webhook processing error:", err);
-    res.status(500).send("Internal Server Error");
+    console.error("Webhook processing error", err);
+    res.status(500).send("Internal Server ERROR");
   }
 };
 

@@ -8,7 +8,6 @@ const { inngest, functions } = require('./inngest/index.js');
 const connectDB = require('./configs/db.js');
 const staticRoutes = require('./router/staticRoute.js');
 const postRoutes = require('./router/postRoutes.js');
-const protectAdmin = require('./auth/auth.js');
 const { stripeWebHooks } = require("./controller/stripewebhooks.js");
 
 dotenv.config();
@@ -18,22 +17,27 @@ const PORT = 5000;
 // Connect to MongoDB
 connectDB();
 
-// STRIPE Webhook FIRST before express.json()
-app.use('/api/stripe', express.raw({ type: 'application/json' }), stripeWebHooks);
+// Stripe webhook must come BEFORE body parsers like express.json()
+app.post(
+  '/api/stripe',
+  express.raw({ type: 'application/json' }), // Stripe requires raw body
+  stripeWebHooks
+);
 
-// All other middlewares AFTER webhook route
+// Other middlewares AFTER webhook route
 app.use(cors());
-app.use(express.json());
+app.use(express.json()); // JSON parser (do NOT use before the Stripe webhook)
 app.use(clerkMiddleware());
 
-// Other Routes
+// Routes
 app.use('/', staticRoutes);
 app.use('/', postRoutes);
 
 // Inngest functions
 app.use("/api/inngest", serve({ client: inngest, functions }));
 
-app.get("/", (req, res) => res.send('Server is Started'));
+// Root route
+app.get("/", (req, res) => res.send('Server is started'));
 
-//  Start server
-app.listen(PORT, () => console.log(`Server started at port ${PORT}`));
+// Start server
+app.listen(PORT, () => console.log(`🚀 Server started at port ${PORT}`));

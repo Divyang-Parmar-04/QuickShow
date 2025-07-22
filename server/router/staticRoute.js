@@ -4,6 +4,7 @@ const router = express.Router()
 const MOVIES = require("../models/moviemodel.js");
 const THEATER = require("../models/theaterModel.js");
 const { createBooking, getOccupiedSeats } = require('../controller/bookingController.js');
+const BOOKING = require('../models/movieBooking.js');
 
 //GETING MOVIES LIST AND THEATER LIST FOR USER
 router.get('/api/movies/location/:location', async (req, res) => {
@@ -26,8 +27,9 @@ router.get('/api/movies/admin/:id', async (req, res) => {
         const { id } = req.params
         const movies = await MOVIES.find();
         const theater = await THEATER.findById(id).populate('movies.movieId');
+        const booking = await BOOKING.find({theater:id}).populate('show')
        
-        return res.json({ movies: movies, theater: theater })
+        return res.json({ movies: movies, theater: theater,bookings:booking})
         
     } catch (error) {
         console.log(error)

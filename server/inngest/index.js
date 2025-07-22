@@ -11,14 +11,14 @@ const inngest = new Inngest({
 });
 
 
-
 // Inngest function to create user :
 const syncUserCreation = inngest.createFunction(
     { id: "sync-user-from-clrek" },
     { event: "clerk/user.created" },
+    console.log("hello"),
     async ({event}) => {
        const {id,first_name,last_name,email_addresses,image_url}=event.data
-
+       console.log(event)
        const userData = {
         _id:id,
         name:first_name + ' ' + last_name,
@@ -35,6 +35,8 @@ const syncUserDeletion = inngest.createFunction(
     { id: "delete-user-from-clrek" },
     { event: "clerk/user.deleted" },
     async ({event}) => {
+       console.log(event)
+
        const {id} = event.data
        await USER.findByIdAndDelete(id)
     },
@@ -47,6 +49,7 @@ const syncUserUpdation = inngest.createFunction(
     async ({event}) => {
 
        const {id,first_name,last_name,email_addresses,image_url}=event.data
+       console.log(event)
 
        const userData = {
         _id:id,

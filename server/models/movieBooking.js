@@ -4,12 +4,13 @@ const { Schema, model } = mongoose;
 const bookingSchema = new Schema(
   {
     user: { type: String, required: true, ref: "user" },
-    show: { type: String, required: true},
+    show: { type:mongoose.Schema.Types.ObjectId,ref:'movie', required: true},
     theater: { type: String, required: true},
     amount: { type: Number, required: true },
     bookedSeats: { type: Array, required: true },
     isPaid: { type: Boolean, default: false },
     paymentLink: { type: String },
+    showDateTime:{type:String,required:true}
   },
   { timestamps: true }
 );

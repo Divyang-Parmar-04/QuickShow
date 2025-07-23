@@ -1,5 +1,6 @@
 const Stripe = require("stripe");
 const BOOKING = require('../models/movieBooking');
+const { Types } = require('mongoose');
 const dotenv = require('dotenv');
 dotenv.config();
 
@@ -27,10 +28,17 @@ const stripeWebHooks = async (req, res) => {
             const { bookingId } = session.metadata;
             console.log("✅ Booking ID from metadata:", bookingId);
 
-            try {
+            // Validate bookingId format
+            if (!Types.ObjectId.isValid(bookingId)) {
+                console.error("❌ Invalid bookingId format");
+                return res.status(400).send("Invalid booking ID");
+            }
 
+            const bookingObjectId = new Types.ObjectId(bookingId);
+
+            try {
                 const updatedBooking = await BOOKING.findByIdAndUpdate(
-                    bookingId,
+                    bookingObjectId,
                     {
                         isPaid: true,
                         paymentLink: ""
@@ -44,17 +52,16 @@ const stripeWebHooks = async (req, res) => {
                     console.error("❌ Booking not found with ID:", bookingId);
                 }
             } catch (dbError) {
-                console.error("❌ MongoDB update failed:", dbError);
-                return res.status(500).send(`MongoDB update error ${dbError.message}`);
+                console.error("❌ MongoDB update failed:", dbError.message);
+                return res.status(500).send("MongoDB update error");
             }
-
         } else {
             console.log("ℹ️ Unhandled event type:", event.type);
         }
 
         res.json({ received: true });
     } catch (error) {
-        console.error("❌ webhook processing error", error);
+        console.error("❌ webhook processing error", error.message);
         res.status(500).send("Internal Server ERROR");
     }
 };

@@ -32,7 +32,7 @@ const stripeWebHooks = async (req, res) => {
                 const book = await BOOKING.findOne({user:bookingId})
                 console.log(book)
             } catch (error) {
-                return res.status(500).send("mongoDB PRObllem");
+                return res.status(500).send(`mongoDB PRObllem : ${error.message}`);
             }
             
 

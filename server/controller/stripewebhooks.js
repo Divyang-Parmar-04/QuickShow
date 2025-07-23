@@ -28,24 +28,34 @@ const stripeWebHooks = async (req, res) => {
             console.log("✅ Booking ID from metadata:", bookingId);
 
             try {
-                const updatedBooking = await BOOKING.findOneAndUpdate(
-                    { user: bookingId },
-                    {
-                        isPaid: true,
-                        paymentLink: ""
-                    },
-                    { new: true }
-                );
 
-                if (updatedBooking) {
-                    console.log("✅ Booking updated successfully:", updatedBooking._id);
-                    return res.json({ received: "true booking update" });
-
-                } else {
-                    console.error("❌ Booking not found with ID:", bookingId);
-                    res.status(500).send(`no booking found `);
-
+                const booking = await BOOKING.findOne({ user: bookingId })
+                if (booking) {
+                    booking.isPaid = true;
+                    booking.paymentLink = ""
+                    await booking.save();
                 }
+                else {
+                    res.status(500).send(`no booking found ${bookingId,booking}`);
+                }
+                // const updatedBooking = await BOOKING.findOneAndUpdate(
+                //     { user: bookingId },
+                //     {
+                //         isPaid: true,
+                //         paymentLink: ""
+                //     },
+                //     { new: true }
+                // );
+
+                // if (updatedBooking) {
+                //     console.log("✅ Booking updated successfully:", updatedBooking._id);
+                //     return res.json({ received: "true booking update" });
+
+                // } else {
+                //     console.error("❌ Booking not found with ID:", bookingId);
+                //     res.status(500).send(`no booking found ${bookingId}`);
+
+                // }
             } catch (dbError) {
                 console.error("❌ MongoDB update failed:", dbError.message);
                 return res.status(500).send("MongoDB update error");

@@ -29,7 +29,7 @@ const stripeWebHooks = async (req, res) => {
 
             try {
 
-                const booking = await BOOKING.findOne({ user: bookingId });
+                const booking = await BOOKING.findById(bookingId);
 
                 if (!booking) {
                     console.error("❌ No booking found for:", bookingId);

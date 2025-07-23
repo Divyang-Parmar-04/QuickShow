@@ -4,7 +4,8 @@ const dotenv = require('dotenv');
 dotenv.config();
 
 const stripeWebHooks = async (req, res) => {
-  console.log("stripe boking")
+  console.log("💡 Stripe webhook called");
+
   const stripeInstance = new Stripe(process.env.STRIPE_SECRET_KEY);
   const sig = req.headers['stripe-signature'];
 
@@ -16,44 +17,47 @@ const stripeWebHooks = async (req, res) => {
       process.env.STRIPE_WEBHOOK_SECRET_KEY
     );
   } catch (error) {
-    console.log(error)
+    console.error("❌ Signature verification failed:", error.message);
     return res.status(400).send(`WebHook Error: ${error.message}`);
   }
-  console.log("stripe boking")
 
   try {
     switch (event.type) {
       case "checkout.session.completed": {
         const session = event.data.object;
         const { bookingId } = session.metadata;
+        console.log("✅ Booking ID from metadata:", bookingId);
 
-        console.log("Booking ID from metadata:", bookingId);
+        try {
+          const updatedBooking = await BOOKING.findByIdAndUpdate(
+            bookingId,
+            {
+              isPaid: true,
+              paymentLink: ""
+            },
+            { new: true }
+          );
 
-        const updatedBooking = await BOOKING.findByIdAndUpdate(
-          bookingId,
-          {
-            isPaid: true,
-            paymentLink: ""
-          },
-          { new: true }
-        );
-
-        if (updatedBooking) {
-          console.log("✅ Booking updated successfully:", updatedBooking._id);
-        } else {
-          console.error("❌ Booking not found with ID:", bookingId);
+          if (updatedBooking) {
+            console.log("✅ Booking updated successfully:", updatedBooking._id);
+          } else {
+            console.error("❌ Booking not found with ID:", bookingId);
+          }
+        } catch (dbError) {
+          console.error("❌ MongoDB update failed:", dbError);
+          return res.status(500).send("MongoDB update error");
         }
 
         break;
       }
 
       default:
-        console.log("Unhandled event type:", event.type);
+        console.log("ℹ️ Unhandled event type:", event.type);
     }
 
     res.json({ received: true });
   } catch (error) {
-    console.error("webHook processing error", error);
+    console.error("❌ webhook processing error", error);
     res.status(500).send("Internal Server ERROR");
   }
 };

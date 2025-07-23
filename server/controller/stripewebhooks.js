@@ -33,7 +33,7 @@ const stripeWebHooks = async (req, res) => {
 
                 if (!booking) {
                     console.error("❌ No booking found for:", bookingId);
-                    return res.status(404).send(`No booking found for email: ${bookingId}`);
+                    return res.status(404).send(`No booking found for this id : ${bookingId}`);
                 }
 
                 booking.isPaid = true;

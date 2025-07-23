@@ -15,7 +15,10 @@ const app = express();
 const PORT = 5000;
 
 // Connect to MongoDB
-connectDB();
+const startServer = async () => {
+  await connectDB(); // ✅ Wait for DB
+  app.listen(PORT, () => console.log(`🚀 Server started at port ${PORT}`));
+};
 
 // Stripe webhook must come BEFORE body parsers like express.json()
 app.post('/api/stripe',express.raw({ type: 'application/json' }), stripeWebHooks); // Stripe requires raw body
@@ -37,4 +40,4 @@ app.use("/api/inngest", serve({ client: inngest, functions }));
 app.get("/", (req, res) => res.send('Server is started'));
 
 // Start server
-app.listen(PORT, () => console.log(`🚀 Server started at port ${PORT}`));
+startServer(); // ✅ Start only after DB is ready

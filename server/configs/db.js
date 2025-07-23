@@ -1,13 +1,18 @@
-const mongoose = require('mongoose')
-const dotenv = require('dotenv')
-dotenv.config()
+const mongoose = require('mongoose');
+const dotenv = require('dotenv');
+dotenv.config();
 
-function connectDB() {
-    mongoose.connect(`${process.env.MONGODB_URL}QuickShow`)
-    // mongoose.connect(`mongodb://localhost:27017/QuickShow`)
-        .then((res) => console.log("mongoDB connected"))
-        .catch((err) => console.log(err))
-
+async function connectDB() {
+  try {
+    await mongoose.connect(`${process.env.MONGODB_URL}QuickShow`, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
+    console.log("✅ MongoDB connected");
+  } catch (error) {
+    console.error("❌ MongoDB connection failed:", error.message);
+    process.exit(1);
+  }
 }
 
-module.exports = connectDB
+module.exports = connectDB;

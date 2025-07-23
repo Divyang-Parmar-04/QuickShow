@@ -42,7 +42,8 @@ const createBooking = async (req, res) => {
       showDateTime: showDateTime
     });
 
-    // console.log(booking)
+    console.log(booking._id.toString())
+
     if (!booking) return res.json({ msg: "Booking failed" });
 
     // 6. Update theater stats

@@ -1,6 +1,5 @@
 const Stripe = require("stripe");
 const BOOKING = require('../models/movieBooking');
-const { Types } = require('mongoose');
 const dotenv = require('dotenv');
 dotenv.config();
 
@@ -28,17 +27,9 @@ const stripeWebHooks = async (req, res) => {
             const { bookingId } = session.metadata;
             console.log("✅ Booking ID from metadata:", bookingId);
 
-            // Validate bookingId format
-            if (!Types.ObjectId.isValid(bookingId)) {
-                console.error("❌ Invalid bookingId format");
-                return res.status(400).send("Invalid booking ID");
-            }
-
-            const bookingObjectId = new Types.ObjectId(bookingId);
-
             try {
-                const updatedBooking = await BOOKING.findByIdAndUpdate(
-                    bookingObjectId,
+                const updatedBooking = await BOOKING.findOneAndUpdate(
+                    { user: bookingId },
                     {
                         isPaid: true,
                         paymentLink: ""
@@ -48,8 +39,12 @@ const stripeWebHooks = async (req, res) => {
 
                 if (updatedBooking) {
                     console.log("✅ Booking updated successfully:", updatedBooking._id);
+                    return res.json({ received: "true booking update" });
+
                 } else {
                     console.error("❌ Booking not found with ID:", bookingId);
+                    res.status(500).send(`no booking found `);
+
                 }
             } catch (dbError) {
                 console.error("❌ MongoDB update failed:", dbError.message);
@@ -60,6 +55,7 @@ const stripeWebHooks = async (req, res) => {
         }
 
         res.json({ received: true });
+
     } catch (error) {
         console.error("❌ webhook processing error", error.message);
         res.status(500).send("Internal Server ERROR");

@@ -29,36 +29,20 @@ const stripeWebHooks = async (req, res) => {
 
             try {
 
-                const booking = await BOOKING.findOne({ user: bookingId })
-                if (booking) {
-                    booking.isPaid = true;
-                    booking.paymentLink = ""
-                    await booking.save();
+                const booking = await BOOKING.findOne({ user: bookingId });
+
+                if (!booking) {
+                    console.error("❌ No booking found for:", bookingId);
+                    return res.status(404).send(`No booking found for email: ${bookingId}`);
                 }
-                else {
-                    res.status(500).send(`no booking found ${bookingId,booking}`);
-                }
-                // const updatedBooking = await BOOKING.findOneAndUpdate(
-                //     { user: bookingId },
-                //     {
-                //         isPaid: true,
-                //         paymentLink: ""
-                //     },
-                //     { new: true }
-                // );
 
-                // if (updatedBooking) {
-                //     console.log("✅ Booking updated successfully:", updatedBooking._id);
-                //     return res.json({ received: "true booking update" });
+                booking.isPaid = true;
+                booking.paymentLink = "";
+                await booking.save();
 
-                // } else {
-                //     console.error("❌ Booking not found with ID:", bookingId);
-                //     res.status(500).send(`no booking found ${bookingId}`);
-
-                // }
             } catch (dbError) {
                 console.error("❌ MongoDB update failed:", dbError.message);
-                return res.status(500).send("MongoDB update error");
+                return res.status(500).send(`MongoDB update error ${dbError.message}`);
             }
         } else {
             console.log("ℹ️ Unhandled event type:", event.type);
@@ -68,7 +52,7 @@ const stripeWebHooks = async (req, res) => {
 
     } catch (error) {
         console.error("❌ webhook processing error", error.message);
-        res.status(500).send("Internal Server ERROR");
+        res.status(500).send(`Internal Server ERROR ${error.message}`);
     }
 };
 

@@ -42,7 +42,7 @@ const createBooking = async (req, res) => {
       showDateTime: showDateTime
     });
 
-    console.log(booking._id.toString())
+    // console.log(booking._id.toString())
 
     if (!booking) return res.json({ msg: "Booking failed" });
 

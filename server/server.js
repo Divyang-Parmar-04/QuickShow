@@ -18,7 +18,8 @@ const PORT = 5000;
 connectDB();
 
 // Stripe webhook must come BEFORE body parsers like express.json()
-app.use('/api/stripe',express.raw({ type: 'application/json' }), stripeWebHooks); // Stripe requires raw body
+app.post('/api/stripe',express.raw({ type: 'application/json' }), stripeWebHooks); // Stripe requires raw body
+
 
 // Other middlewares AFTER webhook route
 app.use(cors());

@@ -4,6 +4,7 @@ const dotenv = require('dotenv');
 dotenv.config();
 
 const stripeWebHooks = async (req, res) => {
+  console.log("stripe boking")
   const stripeInstance = new Stripe(process.env.STRIPE_SECRET_KEY);
   const sig = req.headers['stripe-signature'];
 
@@ -15,8 +16,10 @@ const stripeWebHooks = async (req, res) => {
       process.env.STRIPE_WEBHOOK_SECRET_KEY
     );
   } catch (error) {
+    console.log(error)
     return res.status(400).send(`WebHook Error: ${error.message}`);
   }
+  console.log("stripe boking")
 
   try {
     switch (event.type) {

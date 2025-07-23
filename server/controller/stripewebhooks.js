@@ -29,7 +29,7 @@ const stripeWebHooks = async (req, res) => {
             console.log("✅ Booking ID from metadata:", bookingId);
             
             try {
-                const book = await BOOKING.findOne({_id:bookingId})
+                const book = await BOOKING.findOne({user:bookingId})
                 console.log(book)
             } catch (error) {
                 return res.status(500).send("mongoDB PRObllem");

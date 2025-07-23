@@ -92,7 +92,7 @@ const createBooking = async (req, res) => {
       line_items: line_items,
       mode: 'payment',
       metadata: {
-        bookingId: booking._id.toString()
+        bookingId: booking.user
       },
       expires_at: Math.floor(Date.now() / 1000) + 30 * 60, // 30 mins
     });

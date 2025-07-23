@@ -1,6 +1,6 @@
 const Stripe = require("stripe");
 const BOOKING = require('../models/movieBooking');
-const mongoose = require('mongoose')
+const { Types } = require('mongoose'); // ✅ Recommended import
 const dotenv = require('dotenv');
 dotenv.config();
 
@@ -23,39 +23,34 @@ const stripeWebHooks = async (req, res) => {
     }
 
     try {
-        switch (event.type) {
-            case "checkout.session.completed": {
-                const session = event.data.object;
-                const { bookingId } = session.metadata;
-                console.log("✅ Booking ID from metadata:", bookingId);
+        if (event.type === "checkout.session.completed") {
+            const session = event.data.object;
+            const { bookingId } = session.metadata;
+            console.log("✅ Booking ID from metadata:", bookingId);
 
-                try {
-                    const bookingObjectId = new mongoose.Types.ObjectId(bookingId);
+            try {
+                const bookingObjectId = Types.ObjectId.createFromHexString(bookingId); // ✅ No deprecation
 
-                    const updatedBooking = await BOOKING.findByIdAndUpdate(
-                        bookingObjectId,
-                        {
-                            isPaid: true,
-                            paymentLink: ""
-                        },
-                        { new: true }
-                    );
+                const updatedBooking = await BOOKING.findByIdAndUpdate(
+                    bookingObjectId,
+                    {
+                        isPaid: true,
+                        paymentLink: ""
+                    },
+                    { new: true }
+                );
 
-                    if (updatedBooking) {
-                        console.log("✅ Booking updated successfully:", updatedBooking._id);
-                    } else {
-                        console.error("❌ Booking not found with ID:", bookingId);
-                    }
-                } catch (dbError) {
-                    console.error("❌ MongoDB update failed:", dbError);
-                    return res.status(500).send("MongoDB update error");
+                if (updatedBooking) {
+                    console.log("✅ Booking updated successfully:", updatedBooking._id);
+                } else {
+                    console.error("❌ Booking not found with ID:", bookingId);
                 }
-
-                break;
+            } catch (dbError) {
+                console.error("❌ MongoDB update failed:", dbError);
+                return res.status(500).send("MongoDB update error");
             }
-
-            default:
-                console.log("ℹ️ Unhandled event type:", event.type);
+        } else {
+            console.log("ℹ️ Unhandled event type:", event.type);
         }
 
         res.json({ received: true });

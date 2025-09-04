@@ -1,8 +1,19 @@
-import { dummyShowsData } from '../assets/assets'
+
 import MovieCard from '../components/MovieCard'
+import { useEffect,useState, } from 'react';
+import { useSelector } from 'react-redux';
 
 function Movies() {
-  return dummyShowsData.length > 0 ? (
+
+  const data = useSelector((data) => data.data.movieData);
+  const [movies, setMovies] = useState([])
+
+  useEffect(() => {
+    setMovies(data)
+  }, [data])
+
+
+  return movies.length > 0 ? (
     <div className="relative my-40 mb-60 px-6 md:px-16 lg:px-40 xl:px-44 overflow-hidden min-h-[80vh] pb-3">
       <div className="absolute -z-50 h-58 w-58 aspect-square rounded-full bg-primary/30 blur-3xl" style={{ inset: "150px auto auto 0px" }} />
       <div className="absolute -z-50 h-58 w-58 aspect-square rounded-full bg-primary/30 blur-3xl" style={{ inset: "auto 50px 50px auto" }} />
@@ -10,8 +21,8 @@ function Movies() {
       <h1 className="text-lg font-medium my-4 ml-15">Now Showing</h1>
 
       <div className="flex flex-wrap max-sm:justify-center max-md:justify-center justify-center gap-8">
-        {dummyShowsData.map((movie, index) => (
-         <MovieCard key={index} movie={movie} />
+        {movies.map((movie, index) => (
+          <MovieCard key={index} movie={movie} />
         ))}
       </div>
     </div>

@@ -27,8 +27,6 @@ router.post("/api/movie/newbooking",createBooking)
 //GET OQUPIED SEAT
 router.get("/api/theater/:theaterId/movie/:movieId/occupied-seats",getOccupiedSeats)
 
-
-
 //NEW SHOW ADD
 router.post("/api/admin/newShow", async (req, res) => {
   try {

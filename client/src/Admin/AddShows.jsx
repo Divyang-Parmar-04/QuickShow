@@ -1,21 +1,29 @@
 import React, { useEffect, useState } from 'react'
-import { dummyShowsData } from '../assets/assets';
 import Loader from '../components/Loader';
 import { CheckIcon, DeleteIcon, Star } from 'lucide-react';
 import kConverter from '../lib/kConverter';
+import axios from "axios"
+import { useDispatch, useSelector } from 'react-redux'
+import toast from 'react-hot-toast'
 
 function AddShows() {
 
+  const dispatch = useDispatch()
   const currency = import.meta.env.VITE_CURRENCY || '₹';
+  const admin = useSelector((admin) => admin.data.adminTheater)
 
   const [nowPlayingMovies, setNowPlayingMovies] = useState([])
   const [selectedMovie, setSelectedMovie] = useState(null);
   const [dateTimeSelection, setDateTimeSelection] = useState({})
   const [dateTimeInput, setDateTimeInput] = useState('');
   const [showPrice, setShowPrice] = useState("")
+  const id = localStorage.getItem('ownerId')
+
 
   function fetchNowPlayingMovies() {
-    setNowPlayingMovies(dummyShowsData)
+
+    const allMovies = admin?.movies || [];
+    setNowPlayingMovies(allMovies);
   }
 
   function handleDateTimeAdd() {
@@ -47,9 +55,44 @@ function AddShows() {
     })
   }
 
+  function convertTo12Hour(time24) {
+    const [hour, minute] = time24.split(":").map(Number);
+    const period = hour >= 12 ? "PM" : "AM";
+    const hour12 = hour % 12 || 12; // Convert 0 to 12
+    return `${hour12}:${minute.toString().padStart(2, "0")} ${period}`;
+  }
+
+  function handleAddShow() {
+
+    if (!selectedMovie) {
+      return toast('Please Select Movie')
+    }
+
+    const show = {
+      theaterId: id,
+      movieId: selectedMovie,
+      price: showPrice,
+      date:dateTimeInput.split('T')[0],
+      time:convertTo12Hour(dateTimeInput.split('T')[1])
+    }
+
+    axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/admin/newShow`, show)
+      .then((res) => {
+        if (res.data.msg) { return toast("Show Added Successfully") }
+      })
+      .catch((err) => {
+        console.log(err);
+        alert("Movie Fetch ERROR");
+      });
+
+  }
+
   useEffect(() => {
-    fetchNowPlayingMovies();
-  }, [])
+    if (id, admin) {
+      fetchNowPlayingMovies();
+    }
+  }, [admin, id])
+
 
   return nowPlayingMovies.length > 0 ? (
     <>
@@ -63,11 +106,11 @@ function AddShows() {
           {nowPlayingMovies.map((movie, index) => (
             <div
               key={index}
-              className={`relative max-w-40 cursor-pointer group-hover:not-hover:opacity-40 hover:-translate-y-1 transition duration-300`}
+              className={`relative max-w-40  cursor-pointer group-hover:not-hover:opacity-40 hover:-translate-y-1 transition duration-300`}
 
               onClick={() => setSelectedMovie(movie._id)}
             >
-              <div className="relative rounded-lg overflow-hidden">
+              <div className="relative rounded-lg overflow-hidden h-50">
                 <img
                   alt={movie.title}
                   className="w-full object-cover brightness-90"
@@ -92,8 +135,6 @@ function AddShows() {
           ))}
         </div>
       </div>
-
-
       {/* setShow Price */}
       <div className="mt-8">
         <label className="block text-sm font-medium mb-2">Show Price</label>
@@ -120,9 +161,9 @@ function AddShows() {
             onChange={(e) => setDateTimeInput(e.target.value)}
 
           />
-          <button className="bg-primary/80 text-white px-3 py-2 text-sm rounded-lg hover:bg-primary cursor-pointer" onClick={handleDateTimeAdd}>
+          {/* <button className="bg-primary/80 text-white px-3 py-2 text-sm rounded-lg hover:bg-primary cursor-pointer" onClick={handleDateTimeAdd}>
             Add Time
-          </button>
+          </button> */}
         </div>
       </div>
 
@@ -143,7 +184,7 @@ function AddShows() {
                         className="ml-2 text-red-500 hover:text-red-700 cursor-pointer"
                         size={15}
                         aria-hidden="true"
-                        onClick = {()=>handleRemoveTime(date,time)}
+                        onClick={() => handleRemoveTime(date, time)}
                       />
                     </div>
                   ))}
@@ -154,7 +195,7 @@ function AddShows() {
         </div>
       )}
 
-      <button className="bg-primary text-white px-8 py-2 mt-6 rounded hover:bg-primary/90 transition-all cursor-pointer">
+      <button className="bg-primary text-white px-8 py-2 mt-6 rounded hover:bg-primary/90 transition-all cursor-pointer" onClick={handleAddShow}>
         Add Show
       </button>
 

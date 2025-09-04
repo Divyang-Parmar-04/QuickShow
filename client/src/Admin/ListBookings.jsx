@@ -1,19 +1,23 @@
 import { useEffect, useState } from "react"
 import Loader from "../components/Loader"
-import { dummyBookingData } from "../assets/assets"
 import dateFormat from "../lib/dateFormat"
+import { useSelector } from 'react-redux'
 
 function ListBookings() {
 
   const currency = import.meta.env.VITE_CURRENCY
+  const admin = useSelector((admin) => admin.data.adminTheater);
 
   const [bookings, setBookings] = useState([])
   const [loading, setLoading] = useState(true)
 
-  useEffect(() => {
-    setBookings(dummyBookingData)
-    setLoading(false)
-  })
+ useEffect(() => {
+  if (bookings.length === 0 && Array.isArray(admin?.bookings)) {
+    setBookings(admin.bookings);
+    setLoading(false);
+  }
+}, [admin]);
+
 
 
   return !loading ? (
@@ -36,11 +40,11 @@ function ListBookings() {
           </thead>
 
           <tbody className="text-sm font-light">
-            {bookings.map((booking) => (
+            {bookings.length > 0 && bookings.map((booking) => (
               <tr className="border-b border-primary/10 bg-primary/5 even:bg-primary/10" key={booking._id}>
-                <td className="p-2 min-w-45 pl-5">{booking.user.name}</td>
-                <td className="p-2 min-w-45 pl-5">{booking.show.movie.title}</td>
-                <td className="p-2">{dateFormat(booking.show.showDateTime)}</td>
+                <td className="p-2 min-w-45 pl-5">{booking.user}</td>
+                <td className="p-2 min-w-45 pl-5">{booking?.show.title}</td>
+                <td className="p-2">{booking.showDateTime}</td>
                 <td className="p-2">{booking.bookedSeats.join(' ,')}</td>
                 <td className="p-2">{currency}{booking.amount}</td>
               </tr>

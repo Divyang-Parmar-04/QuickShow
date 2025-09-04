@@ -1,14 +1,16 @@
 const express = require("express");
+const cron = require("node-cron");
+const THEATER = require("./models/theaterModel.js");
 const cors = require('cors');
 const dotenv = require('dotenv');
 const { clerkMiddleware } = require('@clerk/express');
-const { serve } = require("inngest/express");
 
-const { inngest, functions } = require('./inngest/index.js');
+
 const connectDB = require('./configs/db.js');
 const staticRoutes = require('./router/staticRoute.js');
 const postRoutes = require('./router/postRoutes.js');
-const { stripeWebHooks } = require("./controller/stripewebhooks.js");
+const { cleanExpiredSchedules } = require("./configs/autoCleanUp.js");
+
 
 dotenv.config();
 const app = express();
@@ -17,12 +19,8 @@ const PORT = 5000;
 // Connect to MongoDB
 const startServer = async () => {
   await connectDB(); // ✅ Wait for DB
-  app.listen(PORT, () => console.log(`🚀 Server started at port ${PORT}`));
+  app.listen(PORT,'0.0.0.0', () => console.log(`🚀 Server started at port ${PORT}`));
 };
-
-// Stripe webhook must come BEFORE body parsers like express.json()
-app.post('/api/stripe',express.raw({ type: 'application/json' }), stripeWebHooks); // Stripe requires raw body
-
 
 // Other middlewares AFTER webhook route
 app.use(cors());
@@ -33,11 +31,51 @@ app.use(clerkMiddleware());
 app.use('/', staticRoutes);
 app.use('/', postRoutes);
 
-// Inngest functions
-app.use("/api/inngest", serve({ client: inngest, functions }));
-
 // Root route
 app.get("/", (req, res) => res.send('Server is started'));
 
 // Start server
 startServer(); // ✅ Start only after DB is ready
+
+//Auto CleanUp
+cleanExpiredSchedules()
+
+// Run at 12:00 AM every day
+cron.schedule("0 0 * * *", async () => {
+  try {
+    const today = new Date().toISOString().split("T")[0];
+    console.log("⏰ Running daily cleanup at midnight...");
+
+    // 1 Remove expired schedules
+    const scheduleCleanup = await THEATER.updateMany(
+      {},
+      {
+        $pull: {
+          "movies.$[].schedules": {
+            date: { $lt: today },
+          },
+        },
+      }
+    );
+
+    console.log("✅ Removed expired schedules from", scheduleCleanup.modifiedCount, "theaters");
+
+    // 2 Remove movies with empty schedules
+    const emptyMoviesCleanup = await THEATER.updateMany(
+      {},
+      {
+        $pull: {
+          movies: {
+            schedules: { $size: 0 },
+          },
+        },
+      }
+    );
+
+    console.log("✅ Removed empty movies from", emptyMoviesCleanup.modifiedCount, "theaters");
+
+  } catch (error) {
+    console.error("❌ Error in daily cleanup:", error);
+  }
+});
+

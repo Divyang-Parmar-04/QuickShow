@@ -5,6 +5,7 @@ const MOVIES = require("../models/moviemodel.js");
 const THEATER = require("../models/theaterModel.js");
 const { createBooking, getOccupiedSeats } = require('../controller/bookingController.js');
 const BOOKING = require('../models/movieBooking.js');
+const { checkPaymentStatus } = require('../controller/stripePaymentValidation.js');
 
 //GETING MOVIES LIST AND THEATER LIST FOR USER
 router.get('/api/movies/location/:location', async (req, res) => {
@@ -40,6 +41,9 @@ router.get('/api/movies/admin/:id', async (req, res) => {
 
 //BOOKING ROUTES 
 router.post("/api/create/booking",createBooking)
+
+//CHECKED PAYMENT STATUS
+router.get("/api/payment-status/:sessionId", checkPaymentStatus);
 
 router.get("/api/booking/occupiedseat/:thaeterid/:showId",getOccupiedSeats)
 

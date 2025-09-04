@@ -10,7 +10,8 @@ const bookingSchema = new Schema(
     bookedSeats: { type: Array, required: true },
     isPaid: { type: Boolean, default: false },
     paymentLink: { type: String },
-    showDateTime:{type:String,required:true}
+    showDateTime:{type:String,required:true},
+    sessionId:{type:String}
   },
   { timestamps: true }
 );

@@ -12,10 +12,12 @@
   "dependencies": {
     "@clerk/express": "^1.7.5",
     "cors": "^2.8.5",
+    "cron": "^4.3.2",
     "dotenv": "^17.1.0",
     "express": "^5.1.0",
     "inngest": "^3.40.1",
     "mongoose": "^8.16.2",
+    "node-cron": "^4.2.1",
     "stripe": "^18.3.0",
     "svix": "^1.69.0"
   },

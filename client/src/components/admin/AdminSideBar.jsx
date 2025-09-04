@@ -1,10 +1,12 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { LayoutDashboardIcon, SquarePlusIcon, ListIcon, ListCollapseIcon } from 'lucide-react';
+import { useSelector } from 'react-redux';
 
 
 const AdminSidebar = () => {
   const location = useLocation();
+  const admin = useSelector((admin)=>admin.data.adminTheater?.theater)
 
   const adminNavLinks = [
     { name: 'Dashboard', path: '/admin', icon: LayoutDashboardIcon },
@@ -21,7 +23,7 @@ const AdminSidebar = () => {
         alt="sidebar"
         src="/assets/profile.png"
       />
-      <p className="mt-2 text-base max-md:hidden">Admin User</p>
+      <p className="mt-2 text-base max-md:hidden">{admin?.theater_name}</p>
       <div className="w-full">
 
         {adminNavLinks.map((link) => (

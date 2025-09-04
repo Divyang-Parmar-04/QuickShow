@@ -54,7 +54,7 @@ const createBooking = async (req, res) => {
     const updatedOccupiedSeats = [...occupiedSeatsForShow, ...selectedSeats];
     show.occupiedSeat[showKey] = updatedOccupiedSeats;
 
-    // 🔥 Tell Mongoose this array was modified
+    //  Tell Mongoose this array was modified
     theater.markModified('movies');
 
 
@@ -87,8 +87,8 @@ const createBooking = async (req, res) => {
     }]
 
     const session = await stripeInstance.checkout.sessions.create({
-      success_url: `${process.env.FRONTEND_URL}`,
-      cancel_url: `${process.env.FRONTEND_URL}`,
+      success_url: `${process.env.FRONTEND_URL}?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${process.env.FRONTEND_URL}?session_id={CHECKOUT_SESSION_ID}`,
       line_items: line_items,
       mode: 'payment',
       metadata: {
@@ -97,7 +97,9 @@ const createBooking = async (req, res) => {
       expires_at: Math.floor(Date.now() / 1000) + 30 * 60, // 30 mins
     });
 
+
     booking.paymentLink = session.url
+    booking.sessionId = session.id;
 
     await booking.save()
 

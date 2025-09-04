@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
-import { dummyBookingData } from "../assets/assets";
 import Loader from "../components/Loader";
 import BlurCircle from "../components/BlurCircle";
 import timeFormat from "../lib/timeFormat";
-import isoTimeFormat from "../lib/isoTimeFormat";
+import { useUser } from '@clerk/clerk-react'
+import toast from 'react-hot-toast'
+import axios from 'axios'
+import { Link } from "react-router-dom";
 
 const MyBookings = () => {
 
@@ -12,14 +14,53 @@ const MyBookings = () => {
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  function fetchBookings() {
-    setBookings(dummyBookingData);
-    setLoading(false);
-  }
+  const { user } = useUser()
 
   useEffect(() => {
-    fetchBookings();
-  }, [])
+    const fetchBookingsAndCheckPayment = async () => {
+      try {
+        if (!user) return;
+
+        const email = user?.emailAddresses[0].emailAddress;
+
+        // 1. Fetch all bookings
+        const res = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/movie/mybookings/${email}`);
+        if (res.data.msg === 'error') {
+          toast("Something went wrong while fetching bookings", { icon: "❌" });
+          return;
+        }
+
+        let updatedBookings = res.data.bookings;
+
+        // 2. Check each unpaid booking if payment is completed
+        const checkPayments = await Promise.all(
+          updatedBookings.map(async (booking) => {
+            if (!booking.isPaid && booking.sessionId) {
+              try {
+                const statusRes = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/payment-status/${booking.sessionId}`);
+                if (statusRes.data.updated) {
+                  return { ...booking, isPaid: true }; // update locally
+                }
+              } catch (err) {
+                console.error("Payment check error:", err);
+              }
+            }
+            return booking;
+          })
+        );
+
+        setBookings(checkPayments);
+        setLoading(false);
+      } catch (err) {
+        console.error(err);
+        toast("Something went wrong", { icon: "❌" });
+        setLoading(false);
+      }
+    };
+
+    fetchBookingsAndCheckPayment();
+  }, [user]);
+
 
 
   return !loading ? (
@@ -33,18 +74,18 @@ const MyBookings = () => {
 
       {/* Booking Card */}
 
-      {bookings.map((booking, index) => (
+      {bookings.length > 0 ? bookings.map((booking, index) => (
         <div key={index} className="flex flex-col md:flex-row justify-between bg-primary/8 border border-primary/20 rounded-lg mt-4 p-2 max-w-3xl">
           <div className="flex flex-col md:flex-row">
             <img
               alt=""
               className="md:max-w-45 aspect-video h-auto object-cover object-bottom rounded"
-              src={booking.show.movie.backdrop_path}
+              src={booking.show.backdrop_path}
             />
             <div className="flex flex-col p-4">
-              <p className="text-lg font-semibold">{booking.show.movie.title}</p>
-              <p className="text-gray-400 text-sm">{timeFormat(booking.show.movie.runtime)}</p>
-              <p className="text-gray-400 text-sm mt-auto">{isoTimeFormat(booking.show.showDateTime)}</p>
+              <p className="text-lg font-semibold">{booking.show.title}</p>
+              <p className="text-gray-400 text-sm">{timeFormat(booking.show.runtime)}</p>
+              <p className="text-gray-400 text-sm mt-auto">Date : {booking.showDateTime.split(" ")[0]} <br />Time : {booking.showDateTime.split(" ")[1]} {booking.showDateTime.split(" ")[2]}</p>
             </div>
           </div>
           <div className="flex flex-col md:items-end md:text-right justify-between p-4">
@@ -52,7 +93,7 @@ const MyBookings = () => {
               <p className="text-2xl font-semibold mb-3">{currency}{booking.amount}</p>
               {!booking.isPaid && (
                 <button
-                  className="bg-primary px-4 py-1.5 mb-3 text-sm rounded-full font-medium cursor-pointer"> Pay Now
+                  className="bg-primary px-4 py-1.5 mb-3 text-sm rounded-full font-medium cursor-pointer" ><Link to={booking.paymentLink}>Pay Now</Link>
                 </button>
               )}
             </div>
@@ -66,7 +107,11 @@ const MyBookings = () => {
             </div>
           </div>
         </div>
-      ))}
+      )) : (
+        <div className="flex justify-center items-center h-80">
+          <h1 className="text-[30px]">NO BOOKING </h1>
+        </div>
+      )}
 
 
     </div>

@@ -8,22 +8,23 @@
 }
 *{
     font-family: "Outfit", sans-serif;
-    scrollbar-width: thin;
-    scrollbar-color: #787777 #e1e1e1;
+    /* scrollbar-width: thin;
+    scrollbar-color: #787777 #e1e1e1; */
 }
 
 body{
     color: white;
     background-color: #09090B;
+    scrollbar-width: thin;
 }
 
 body::-webkit-scrollbar{
-    display: none;
+    height: 0;
     width:0;
 }
 
 .no-scrollbar::-webkit-scrollbar {
-    display: none; /* Chrome, Safari */
+    display: none; 
 }
 
 .no-scrollbar {

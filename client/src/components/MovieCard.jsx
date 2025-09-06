@@ -46,7 +46,7 @@ function MovieCard({ movie,fav=false }) {
                     {movie.vote_average.toFixed(1)}
                 </p>
             </div>
-            {(fav && isHover) && (<button className={`absolute top-2 right-2 cursor-pointer`} onClick={()=>handleDeleteFavorite(movie._id)} id={movie._id}><XIcon className='bg-red-600'/></button>)}
+            {(fav) && (<button className={`absolute top-2 right-2 cursor-pointer`} onClick={()=>handleDeleteFavorite(movie._id)} id={movie._id}><XIcon className='bg-red-600'/></button>)}
         </div>
     )
 }

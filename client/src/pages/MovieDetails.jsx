@@ -24,11 +24,12 @@ function MovieDetails() {
   const [favorite, setFavorite] = useState(false)
   const { id } = useParams();
   const [show, setShow] = useState(null);
-  const [thID,setThId] = useState()
+  const [thID, setThId] = useState()
+  const [traillerLink, setTraillerLink] = useState('')
 
   //favorite
   function checkFavorite() {
-    axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/movie/favorite`, { userId: user?.id, id: id ,newMovie:false })
+    axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/movie/favorite`, { userId: user?.id, id: id, newMovie: false })
       .then((res) => {
         if (res.data.msg == 'error') {
           return toast("Somthing went wrong", { icon: "❌" })
@@ -44,10 +45,10 @@ function MovieDetails() {
 
   function handleAddToFavorite() {
     if (user, id) {
-      axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/movie/favorite`, { userId: user?.id, id: id ,newMovie:true})
+      axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/movie/favorite`, { userId: user?.id, id: id, newMovie: true })
         .then((res) => {
-            toast("movie Add to Favorite", { icon: "✅" })
-            setFavorite(true)
+          toast("movie Add to Favorite", { icon: "✅" })
+          setFavorite(true)
         })
         .catch((err) => {
           toast("Somthing went wrong", { icon: "❌" })
@@ -56,11 +57,12 @@ function MovieDetails() {
   }
 
   useEffect(() => {
-
-    const movie = data.movieData.find((show) => show._id === id);
+    // console.log(data)
+    const movie = data.movieData.find((show) => show.id == id);
+    // console.log(movie)
     const thdata = data.TheaterData
       .map((th) => {
-        const matchedMovies = th.movies.filter((movie) => movie.movieId === id);
+        const matchedMovies = th.movies.filter((movie) => movie.movieId == id);
         if (matchedMovies.length > 0) {
           return {
             ...th,
@@ -72,9 +74,13 @@ function MovieDetails() {
       .filter((th) => th !== null);
 
     setShow({ movie: movie, TheaterData: thdata });
+
+    const link = movie?.videos?.results?.find((vid) => vid.type === "Trailer" && vid.site === "YouTube");
+    setTraillerLink(`https://www.youtube.com/watch?v=${link?.key}`)
+
     setThMovies(thdata[0]?.movies[0])
     setThId(thdata[0]?._id)
-    // console.log(thdata)
+    console.log(thdata, movie)
 
   }, [data, id]);
 
@@ -89,9 +95,18 @@ function MovieDetails() {
       {/* Movie Details Header */}
       <div className="flex flex-col md:flex-row gap-8 max-w-6xl mx-auto">
         <img
-          alt=""
+
           className="max-md:mx-auto rounded-xl h-104 max-w-70 object-cover"
-          src={show.movie?.poster_path}
+          src={
+            show.movie?.poster_path!=null
+              ? `https://image.tmdb.org/t/p/w500${show.movie.poster_path}`
+              : "/assets/profile.png"
+          }
+          onError={(e) => {
+            e.currentTarget.src = "/assets/logo.png";
+          }}
+          alt={show.movie?.title || "Movie poster"}
+
         />
         <div className="relative flex flex-col gap-3">
           <BlurCircle top="-100px" left="-100px" />
@@ -104,12 +119,13 @@ function MovieDetails() {
           <p className="text-gray-400 mt-2 text-sm leading-tight max-w-xl">
             {show.movie?.overview}
           </p>
-          <p>{timeFormat(show.movie?.runtime)} • {show.movie?.genres.map((genre) => genre).join(", ")} • {show.movie?.release_date.split("-")[0]}</p>
+          <p>{timeFormat(show.movie?.runtime)} • {show.movie?.genres.map((genre) => genre.name).join(", ")} • {show.movie?.release_date.split("-")[0]}</p>
 
           <div className="flex items-center flex-wrap gap-4 mt-4">
             <button className="flex items-center gap-2 px-7 py-3 text-sm bg-gray-800 hover:bg-gray-900 transition rounded-md font-medium cursor-pointer active:scale-95">
               <PlayIcon className="w-5 h-5" />
-              Watch Trailer
+              <a href={traillerLink} target='blank'>Watch Trailer</a>
+
             </button>
             <a href="#dateSelect" className="px-10 py-3 text-sm bg-primary hover:bg-primary-dull transition rounded-md font-medium cursor-pointer active:scale-95">
               Buy Tickets
@@ -131,14 +147,14 @@ function MovieDetails() {
       <p className="text-lg font-medium mt-20">Your Favorite Cast</p>
       <div className="overflow-x-auto no-scrollbar mt-8 pb-4">
         <div className="flex items-center gap-4 w-max px-4">
-          {show.movie?.cast.map((cast, index) => (
+          {show.movie?.credits.cast.map((cast, index) => (
             <div className="flex flex-col items-center text-center" key={index}>
               <img
                 alt=""
-                className="rounded-full h-20 md:h-20 aspect-square object-cover"
-                src={cast.profile_path}
+                className="rounded-full h-20 md:h-20 w-20 aspect-square object-cover"
+                src={'https://image.tmdb.org/t/p/w500' + cast.profile_path}
               />
-              <p className="font-medium text-xs mt-3">{cast.name}</p>
+              <p className="font-medium text-xs mt-3">{cast.character}</p>
             </div>
           ))}
         </div>
@@ -149,7 +165,7 @@ function MovieDetails() {
         ) : (
           <>
             <p className="text-lg font-medium mt-20">Select Theater </p>
-            <TheaterPage theaters={show.TheaterData} onUpdateTheater={(data,id) =>{setThMovies(data),setThId(id)}} />
+            <TheaterPage theaters={show.TheaterData} onUpdateTheater={(data, id) => { setThMovies(data), setThId(id) }} />
             {/* Date Selection */}
             <DateSelect movie={thMovies} id={id} theaterId={thID} />
           </>

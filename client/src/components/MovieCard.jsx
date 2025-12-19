@@ -14,7 +14,7 @@ function MovieCard({ movie,fav=false }) {
     function handleDeleteFavorite(id){
        if(user){
            console.log(user?.id ,id)
-          axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/movie/favorite/delete`,{userId:user?.id,movieId:id})
+           axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/movie/favorite/delete`,{userId:user?.id,movieId:id})
           .then((res)=>{
             if(res.data.msg=='error')toast.error("Somthing went Wrong")
             else if(res.data.msg)toast.success("Movie Remove From Favorite List")
@@ -29,16 +29,16 @@ function MovieCard({ movie,fav=false }) {
     return (
         <div className={`relative flex flex-col justify-between bg-gray-900 text-white rounded-[10px] hover:-translate-y-2 transition duration-300 w-60 cursor-pointer`} onMouseOver={()=>setIsHover(true)} onMouseOut={()=>setIsHover(false)}>
             <img
-                onClick={() => { navigate(`/movies/${movie._id}`); scrollTo(0, 0) }}
+                onClick={() => { navigate(`/movies/${movie.id}`); scrollTo(0, 0) }}
                 alt=""
-                className="rounded-[10px] h-75 object-cover object-right-bottom cursor-pointer"
-                src={movie.poster_path}
+                className="rounded-[10px] h-75 object-contains object-right-bottom cursor-pointer"
+                src={"https://image.tmdb.org/t/p/w780"+movie.poster_path}
             />
             <p className="font-semibold mt-2 truncate mx-2">{movie.title}</p>
-            <p className="text-sm text-gray-400 mt-2 mx-2">{new Date(movie.release_date).getFullYear()} • {movie.genres.slice(0, 2).map(genre => genre).join(' | ')} • {timeFormat(movie.runtime)}
+            <p className="text-sm text-gray-400 mt-2 mx-2">{new Date(movie.release_date).getFullYear()} • {movie.genres.slice(0, 2).map(genre => genre.name).join(' | ')} • {timeFormat(movie.runtime)}
             </p>
             <div className="flex items-center justify-between mt-4 pb-3 mx-2">
-                <button className="px-4 py-2 text-xs bg-primary hover:bg-primary-dull transition rounded-full font-medium cursor-pointer" onClick={() =>{navigate(`/movies/${movie._id}`); scrollTo(0, 0)}}>
+                <button className="px-4 py-2 text-xs bg-primary hover:bg-primary-dull transition rounded-full font-medium cursor-pointer" onClick={() =>{navigate(`/movies/${movie.id}`); scrollTo(0, 0)}}>
                     Buy Tickets
                 </button>
                 <p className="flex items-center gap-1 text-sm text-gray-400 mt-1 pr-1">
@@ -46,7 +46,7 @@ function MovieCard({ movie,fav=false }) {
                     {movie.vote_average.toFixed(1)}
                 </p>
             </div>
-            {(fav) && (<button className={`absolute top-2 right-2 cursor-pointer`} onClick={()=>handleDeleteFavorite(movie._id)} id={movie._id}><XIcon className='bg-red-600'/></button>)}
+            {(fav) && (<button className={`absolute top-2 right-2 cursor-pointer`} onClick={()=>handleDeleteFavorite(movie.id)} id={movie.id}><XIcon className='bg-red-600'/></button>)}
         </div>
     )
 }

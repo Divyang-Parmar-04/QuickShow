@@ -6,11 +6,7 @@ import Movies from './pages/Movies'
 import SeatLayout from './pages/SeatLayout'
 import MyBookigns from './pages/MyBookings'
 import Favorite from './pages/Favorite'
-import Layout from './Admin/Layout'
-import DashBoard from './Admin/DashBoard'
-import ListShows from './Admin/ListShows'
-import AddShows from './Admin/AddShows'
-import ListBookings from './Admin/ListBookings'
+
 
 
 const router = createBrowserRouter(
@@ -23,13 +19,7 @@ const router = createBrowserRouter(
       <Route path="movies/:id/:date" element = {<SeatLayout/>}/>
       <Route path="my-bookings" element = {<MyBookigns/>}/>
       <Route path="favorite" element = {<Favorite/>}/>
-    </Route>
-    <Route path="/admin/*" element = {<Layout/>}>
-      <Route path = "" element = {<DashBoard/>}/>
-      <Route path = "list-shows" element = {<ListShows/>}/>
-      <Route path = "add-shows" element = {<AddShows/>}/>
-      <Route path = "list-bookings" element = {<ListBookings/>}/>
-    </Route>
+    </Route>    
     </>
   )
 )

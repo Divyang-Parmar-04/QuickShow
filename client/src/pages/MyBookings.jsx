@@ -6,13 +6,17 @@ import { useUser } from '@clerk/clerk-react'
 import toast from 'react-hot-toast'
 import axios from 'axios'
 import { Link } from "react-router-dom";
+import { useSelector } from 'react-redux'
 
 const MyBookings = () => {
 
   const currency = import.meta.env.VITE_CURRENCY || '$';
+  const movies = useSelector((state) => state.data.movieData)
 
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  const [bookShows, setBookShows] = useState([])
 
   const { user } = useUser()
 
@@ -49,6 +53,16 @@ const MyBookings = () => {
           })
         );
 
+        // console.log(checkPayments[0])
+
+        const shows = checkPayments.map((show) => {
+          // console.log(show)
+          return movies.find((mov) => mov.id == show.show)
+        })
+
+        setBookShows(shows)
+        // console.log(shows[0])
+
         setBookings(checkPayments);
         setLoading(false);
       } catch (err) {
@@ -59,6 +73,8 @@ const MyBookings = () => {
     };
 
     fetchBookingsAndCheckPayment();
+
+
   }, [user]);
 
 
@@ -80,11 +96,11 @@ const MyBookings = () => {
             <img
               alt=""
               className="md:max-w-45 aspect-video h-auto object-cover object-bottom rounded"
-              src={booking.show.backdrop_path}
+              src={"https://image.tmdb.org/t/p/w500"+bookShows[index]?.backdrop_path}
             />
             <div className="flex flex-col p-4">
-              <p className="text-lg font-semibold">{booking.show.title}</p>
-              <p className="text-gray-400 text-sm">{timeFormat(booking.show.runtime)}</p>
+              <p className="text-lg font-semibold">{bookShows[index]?.title}</p>
+              <p className="text-gray-400 text-sm">{timeFormat(bookShows[index]?.runtime)}</p>
               <p className="text-gray-400 text-sm mt-auto">Date : {booking.showDateTime.split(" ")[0]} <br />Time : {booking.showDateTime.split(" ")[1]} {booking.showDateTime.split(" ")[2]}</p>
             </div>
           </div>

@@ -9,6 +9,7 @@ import Loader from './Loader'
 function FeaturedSection() {
     const navigate = useNavigate()
     const data = useSelector((data) => data.data.movieData);
+    // console.log(data)
     const [movies, setMovies] = useState([])
 
     useEffect(() => {
@@ -29,7 +30,7 @@ function FeaturedSection() {
 
                 {movies.length > 0 ? (
                     movies.slice(0, 4).map((show) => (
-                        <MovieCard key={show._id} movie={show} />
+                        <MovieCard key={show.id} movie={show} />
                     ))
                 ) : (
                     <Loader />

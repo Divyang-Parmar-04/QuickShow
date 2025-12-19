@@ -1,5 +1,5 @@
 import { Link, useNavigate } from 'react-router-dom'
-import { MapPin, MenuIcon, SearchIcon, TicketPlus, XIcon } from 'lucide-react'
+import { MapPin, MenuIcon, TicketPlus, XIcon } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useClerk, UserButton, useUser } from '@clerk/clerk-react'
 import { useDispatch } from 'react-redux'
@@ -96,7 +96,7 @@ function Navbar() {
         <Link onClick={() => { scrollTo(0, 0); setIsOpen(false) }} to="/favorite">
           Favorites
         </Link>
-        <Link onClick={() => { scrollTo(0, 0); setIsOpen(false) }} to="/admin">
+        <Link onClick={() => { scrollTo(0, 0); setIsOpen(false) }} to={`${import.meta.env.VITE_ADMIN_URL}`}>
           DashBoard
         </Link>
         <button
@@ -138,7 +138,6 @@ function Navbar() {
       )}
 
       <div className="flex items-center gap-8">
-        <SearchIcon className="max-md:hidden w-6 h-6 cursor-pointer" />
         {!user ? (
           <button
             className="px-4 py-1 sm:px-7 sm:py-3 bg-primary hover:bg-primary-dull transition rounded-full font-medium cursor-pointer"

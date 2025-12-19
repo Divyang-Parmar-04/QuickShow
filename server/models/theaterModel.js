@@ -12,8 +12,9 @@ const theaterSchema = new mongoose.Schema({
   movies: [
     {
       movieId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'movie',
+        // type: mongoose.Schema.Types.ObjectId,
+        // ref: 'movie',
+        type:String,
         required: true,
       },
       movie_name: {

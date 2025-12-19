@@ -27,17 +27,17 @@ app.get("/", (req, res) => res.send("Server is started"));
 // Connect to DB before exporting app
 connectDB()
   .then(() => {
-    console.log("✅ MongoDB connected");
+    console.log("MongoDB connected");
     cleanExpiredSchedules();
   })
   .catch((err) => {
-    console.error("❌ DB connection failed:", err);
+    console.error("DB connection failed:", err);
   });
 
-// 🟢 Development: run normally
+//  Development: run normally
 if (process.env.NODE_ENV !== "production") {
   app.listen(PORT, "0.0.0.0", () =>
-    console.log(`🚀 Server started at http://localhost:${PORT}`)
+    console.log(`Server started at http://localhost:${PORT}`)
   );
 }
 // Export the app (Vercel will handle it)
@@ -47,7 +47,7 @@ module.exports = app;
 cron.schedule("0 0 * * *", async () => {
   try {
     const today = new Date().toISOString().split("T")[0];
-    console.log("⏰ Running daily cleanup at midnight...");
+    console.log(" Running daily cleanup at midnight...");
 
     // 1 Remove expired schedules
     const scheduleCleanup = await THEATER.updateMany(

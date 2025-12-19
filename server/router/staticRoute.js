@@ -26,11 +26,11 @@ router.get('/api/movies/location/:location', async (req, res) => {
 router.get('/api/movies/admin/:id', async (req, res) => {
     try {
         const { id } = req.params
-        const movies = await MOVIES.find();
-        const theater = await THEATER.findById(id).populate('movies.movieId');
-        const booking = await BOOKING.find({theater:id}).populate('show')
+        // const movies = await MOVIES.find();
+        const theater = await THEATER.findById(id);
+        const booking = await BOOKING.find({theater:id})
        
-        return res.json({ movies: movies, theater: theater,bookings:booking})
+        return res.json({ theater: theater,bookings:booking})
         
     } catch (error) {
         console.log(error)

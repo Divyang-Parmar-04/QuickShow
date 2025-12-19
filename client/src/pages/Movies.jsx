@@ -38,7 +38,7 @@ function Movies() {
     else {
       setMovies(data)
     }
-     setTimeout(() => {
+    setTimeout(() => {
       setIsLoading(false);
     }, 1000);
   }
@@ -61,10 +61,13 @@ function Movies() {
         return false;
       }
 
-      // 🎭 Genre (TMDB genre ids)
-      if (genre && !movie.genre_ids?.includes(Number(genre))) {
+      if (
+        genre &&
+        !movie.genres?.some(g => g.id === Number(genre))
+      ) {
         return false;
       }
+
 
       // 🌍 Language
       if (language && movie.original_language !== language) {
@@ -96,6 +99,7 @@ function Movies() {
       region,
       year,
     });
+    // console.log(result)
 
     setMovies(result)
     // simulate async feel (optional)

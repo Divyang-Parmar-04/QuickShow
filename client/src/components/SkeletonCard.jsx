@@ -11,7 +11,7 @@ function SkeletonCard() {
         <Skeleton
           height={280}
           borderRadius={10}
-          className=" w-full z-10"
+          className=" w-full z-9"
           />
           </div>
         {/* Title */}

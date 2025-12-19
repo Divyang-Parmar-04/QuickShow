@@ -52,25 +52,20 @@ function App() {
     const fetchMovies = async () => {
       try {
         const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/movies/location/${location}`);
-        // console.log(response.data)
         dispatch(setTheaterData(response.data.theaters))
-        // console.log(response.data.theaters)
         let moviesid = []
 
         response.data.theaters.map((mov) => {
-          // console.log(mov.movies)
           if (mov?.movies.length > 0) {
             moviesid = mov.movies.map((m) => m.movieId)
           }
         })
 
-        console.log(moviesid)
         if (moviesid.length == 0) alert("NO Movies was found on Selected Location")
         else {
 
           const movies = await fetchMoviesByIds(moviesid)
 
-          // console.log(movies)
           dispatch(setMoviesData(movies))
         }
 

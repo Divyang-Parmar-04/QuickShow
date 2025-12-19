@@ -1,6 +1,5 @@
 const USER = require("../models/userModel")
 const THEATER = require("../models/theaterModel")
-// const MOVIES = require("../models/moviemodel")
 
 const handleAddShow = async(req,res)=>{
   try {
@@ -10,13 +9,10 @@ const handleAddShow = async(req,res)=>{
     if (!theater) return res.json({ msg: "Theater not found" });
 
     // Check if movie already exists in theater
-    // console.log(theater)
+
     let movie = theater.movies.find((mov) => mov.movieId == movieId);
-    // console.log(movie)
 
     if (!movie) {
-    //   const movieDetails = await MOVIES.findById(movieId);
-    //   if (!movieDetails) return res.json({ msg: "Movie not found in DB" });
 
       movie = {
         movieId,
@@ -28,8 +24,8 @@ const handleAddShow = async(req,res)=>{
 
       theater.movies.push(movie);
     } else {
+
       // Check for duplicate schedule
-      console.log("hello")
       const isDuplicate = movie.schedules?.some(
         (s) => s.date === date && s.time === time
       );
@@ -57,7 +53,7 @@ const handleDeleteShow = async(req,res)=>{
     const { mId, tId, sIndex } = req.body;
 
     const theater = await THEATER.findById(tId);
-    console.log(tId,mId,sIndex)
+
     if (!theater) return res.json({ msg: "Theater not found" });
 
     const movieIndex = theater.movies.findIndex((mov) => mov.movieId === mId);
@@ -79,7 +75,6 @@ const handleDeleteShow = async(req,res)=>{
     return res.json({ msg: true });
 
   } catch (error) {
-    console.error(error);
     return res.json({ msg: "Internal server error" });
   }
 }

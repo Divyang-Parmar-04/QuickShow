@@ -1,7 +1,6 @@
 const express = require('express')
 const router = express.Router()
 
-const MOVIES = require("../models/moviemodel.js");
 const THEATER = require("../models/theaterModel.js");
 const { createBooking, getOccupiedSeats } = require('../controller/bookingController.js');
 const BOOKING = require('../models/movieBooking.js');
@@ -11,11 +10,10 @@ const { checkPaymentStatus } = require('../controller/stripePaymentValidation.js
 router.get('/api/movies/location/:location', async (req, res) => {
     try {
         const location = req.params.location
-        const movies = await MOVIES.find({ locations: location })
 
         const theater = await THEATER.find({ location: location })
 
-        return res.json({ movies: movies, theaters: theater })
+        return res.json({theaters: theater })
 
     } catch (error) {
         console.log(error)
@@ -26,7 +24,6 @@ router.get('/api/movies/location/:location', async (req, res) => {
 router.get('/api/movies/admin/:id', async (req, res) => {
     try {
         const { id } = req.params
-        // const movies = await MOVIES.find();
         const theater = await THEATER.findById(id);
         const booking = await BOOKING.find({theater:id})
        

@@ -106,7 +106,7 @@ const createBooking = async (req, res) => {
     return res.json({ book: true, url: session.url });
 
   } catch (error) {
-    console.error("Booking error:", error);
+    // console.error("Booking error:", error);
     return res.json({ msg: "ERROR", error: error.message });
   }
 };
@@ -133,7 +133,7 @@ const getOccupiedSeats = async (req, res) => {
     return res.json({ occupiedSeats });
 
   } catch (error) {
-    console.error("Error fetching occupied seats:", error);
+    // console.error("Error fetching occupied seats:", error);
     return res.status(500).json({ msg: "Server error", error: error.message });
   }
 }

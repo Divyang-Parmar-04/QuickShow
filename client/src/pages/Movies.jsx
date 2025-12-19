@@ -22,7 +22,6 @@ function Movies() {
   const [year, setYear] = useState('2025');
   const [isLoading, setIsLoading] = useState(true)
 
-  const [newResult, setNewResult] = useState([])
 
 
   function handleSearchByName() {

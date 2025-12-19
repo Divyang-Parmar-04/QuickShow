@@ -90,7 +90,7 @@ function SeatLayout() {
       axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/movie/newbooking`, booking)
         .then((res) => {
           if (res.data.book) {
-            console.log(res.data.url)
+            // console.log(res.data.url)
             window.location.href = res.data.url
             setSelectedSeats([])
             setSelectedTime(null)
@@ -104,7 +104,6 @@ function SeatLayout() {
 
   useEffect(() => {
     if (tdata) {
-      console.log(tdata)
       setShow({ dateTime: tdata })
     }
   }, [id, tdata])

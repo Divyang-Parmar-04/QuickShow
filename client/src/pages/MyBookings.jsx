@@ -75,7 +75,7 @@ const MyBookings = () => {
     fetchBookingsAndCheckPayment();
 
 
-  }, [user]);
+  }, [user,movies]);
 
 
 

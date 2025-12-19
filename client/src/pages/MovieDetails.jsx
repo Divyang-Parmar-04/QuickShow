@@ -80,7 +80,6 @@ function MovieDetails() {
 
     setThMovies(thdata[0]?.movies[0])
     setThId(thdata[0]?._id)
-    console.log(thdata, movie)
 
   }, [data, id]);
 

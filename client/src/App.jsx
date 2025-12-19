@@ -70,7 +70,7 @@ function App() {
 
           const movies = await fetchMoviesByIds(moviesid)
 
-          console.log(movies)
+          // console.log(movies)
           dispatch(setMoviesData(movies))
         }
 

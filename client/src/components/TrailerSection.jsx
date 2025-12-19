@@ -21,7 +21,6 @@ function TrailerSection() {
         const moviesInfo = movies.movieData?.map((mov) => ({ title: mov.title, img: mov.backdrop_path }))
 
         setMoviesTrailler({ moviesInfo: moviesInfo, trailer: trailer })
-        console.log(movieTrailler)
 
     }, [movies])
 

@@ -22,7 +22,6 @@ function Favorite() {
             return toast("Somthing went wrong", { icon: "❌" })
           }
           // Filter the movie data
-          // console.log(data,res.data.msg)
           const filteredMovies = data.filter(movie => res.data.msg.includes((movie.id).toString()));
           setMovies(filteredMovies);
 

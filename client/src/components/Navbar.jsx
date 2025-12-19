@@ -17,7 +17,6 @@ function Navbar() {
   const navigate = useNavigate()
   const [location, setLocation] = useState('')
 
-  // console.log(user?.emailAddresses[0].emailAddress)
 
   // Predefined list of locations
   const locations = ['Ahmedabad','Mumbai', 'Delhi', 'Bengaluru', 'Hyderabad', 'Kolkata', 'Chennai']
@@ -33,7 +32,6 @@ function Navbar() {
       }
     }
   }, [])
-  // console.log(user?.emailAddresses[0].emailAddress)
 
   // Handle location selection
   const handleLocationSelect = (selectedLocation) => {

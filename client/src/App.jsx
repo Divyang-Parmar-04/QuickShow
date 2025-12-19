@@ -53,13 +53,10 @@ function App() {
       try {
         const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/movies/location/${location}`);
         dispatch(setTheaterData(response.data.theaters))
-        let moviesid = []
 
-        response.data.theaters.map((mov) => {
-          if (mov?.movies.length > 0) {
-            moviesid = mov.movies.map((m) => m.movieId)
-          }
-        })
+        const moviesid = response.data.theaters.flatMap(mov =>
+          mov?.movies?.map(m => m.movieId) || []
+        );
 
         if (moviesid.length == 0) alert("NO Movies was found on Selected Location")
         else {

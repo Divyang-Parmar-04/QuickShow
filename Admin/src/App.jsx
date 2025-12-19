@@ -29,7 +29,6 @@ function App() {
       if (ownerId != null) {
          axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/movies/admin/${ownerId}`)
             .then((res) => {  
-               console.log(res.datared)
                dispatch(setAdminTheater(res.data))
             })
             .catch((err) => {

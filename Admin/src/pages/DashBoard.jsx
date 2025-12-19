@@ -65,7 +65,6 @@ function DashBoard() {
       }));
 
 
-      console.log(showsPoster)
       setShows(showsPoster)
 
       setDashBoardData({
@@ -80,7 +79,7 @@ function DashBoard() {
     finally {
       setLoading(false);
     }
-    // console.log(admin.theater)
+
   };
 
   useEffect(() => {

@@ -16,7 +16,7 @@ function ListShows() {
     if (shows == null) {
 
       setShows(admin?.theater)
-      // console.log(admin?.bookings)
+
       admin?.theater.movies.map((mov) => {
         const showBooking = admin?.bookings.filter((bok) => mov.movieId._id === bok.show._id)
         let booking = 0;
@@ -31,10 +31,8 @@ function ListShows() {
           bookings: booking,
           Earnings: Earnings
         }
-        // console.log(show)
-
-       
-
+  
+      
         setShowInfo((prev) => [...prev, { show }])
       })
       setLoading(false)

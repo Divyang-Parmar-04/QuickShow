@@ -114,7 +114,6 @@ function AddShows() {
       const response = await fetch(url)
       const data = await response.json()
 
-      console.log(data.result)
       setNowPlayingMovies(data.results)
 
     } catch (error) {
@@ -165,7 +164,6 @@ function AddShows() {
     }
 
     const movieTitle = nowPlayingMovies.filter((movie) => movie.id == selectedMovie)[0].title
-    // console.log(movieTitle)
 
     const show = {
       theaterId: id,
@@ -176,7 +174,6 @@ function AddShows() {
       time: convertTo12Hour(dateTimeInput.split('T')[1])
     }
 
-    // console.log(show)
 
     axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/admin/newShow`, show)
       .then((res) => {
@@ -203,9 +200,6 @@ function AddShows() {
 
     fetchMovies();
   }, [genre, language, region ,year]);
-
-
-
 
   return (
     <>

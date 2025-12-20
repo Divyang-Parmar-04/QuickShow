@@ -3,6 +3,7 @@ const cron = require("node-cron");
 const THEATER = require("./models/theaterModel.js");
 const cors = require("cors");
 const dotenv = require("dotenv");
+const BOOKING = require('./models/movieBooking.js')
 
 const connectDB = require("./configs/db.js");
 const staticRoutes = require("./router/staticRoute.js");
@@ -46,8 +47,11 @@ module.exports = app;
 // Run at 12:00 AM every day
 cron.schedule("0 0 * * *", async () => {
   try {
+
+    const now = new Date();
     const today = new Date().toISOString().split("T")[0];
-    console.log(" Running daily cleanup at midnight...");
+
+    // console.log(" Running daily cleanup at midnight...");
 
     // 1 Remove expired schedules
     const scheduleCleanup = await THEATER.updateMany(
@@ -61,7 +65,7 @@ cron.schedule("0 0 * * *", async () => {
       }
     );
 
-    console.log("✅ Removed expired schedules from", scheduleCleanup.modifiedCount, "theaters");
+    // console.log("✅ Removed expired schedules from", scheduleCleanup.modifiedCount, "theaters");
 
     // 2 Remove movies with empty schedules
     const emptyMoviesCleanup = await THEATER.updateMany(
@@ -75,7 +79,29 @@ cron.schedule("0 0 * * *", async () => {
       }
     );
 
-    console.log("✅ Removed empty movies from", emptyMoviesCleanup.modifiedCount, "theaters");
+    // console.log("✅ Removed empty movies from", emptyMoviesCleanup.modifiedCount, "theaters");
+
+    // 3️⃣ REMOVE EXPIRED BOOKINGS
+
+    const bookings = await BOOKING.find({}, { showDateTime: 1 });
+
+    const expiredBookingIds = bookings
+      .filter((booking) => {
+        const showDate = new Date(booking.showDateTime);
+        return showDate < now;
+      })
+      .map((booking) => booking._id);
+
+    if (expiredBookingIds.length > 0) {
+      const bookingCleanup = await BOOKING.deleteMany({
+        _id: { $in: expiredBookingIds },
+      });
+
+      console.log("🗑️ Deleted", bookingCleanup.deletedCount,"expired bookings");
+
+    } else {
+      console.log("ℹ️ No expired bookings found");
+    }
 
   } catch (error) {
     console.error("❌ Error in daily cleanup:", error);

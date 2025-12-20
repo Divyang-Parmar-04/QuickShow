@@ -44,7 +44,8 @@ function MovieDetails() {
   }
 
   function handleAddToFavorite() {
-    if (user, id) {
+    if (user && id) {
+      
       axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/movie/favorite`, { userId: user?.id, id: id, newMovie: true })
         .then((res) => {
           toast("movie Add to Favorite", { icon: "✅" })
@@ -53,6 +54,9 @@ function MovieDetails() {
         .catch((err) => {
           toast("Somthing went wrong", { icon: "❌" })
         })
+    }
+    else{
+      toast("Please Login",{icon:"😊"})
     }
   }
 
@@ -84,7 +88,7 @@ function MovieDetails() {
   }, [data, id]);
 
   useEffect(() => {
-    if (id, user) {
+    if (id && user) {
       checkFavorite()
     }
   }, [id, user])

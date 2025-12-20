@@ -78,7 +78,7 @@ function SeatLayout() {
 
 
   function handleMyBooking() {
-    if (tdata, user) {
+    if (tdata &&  user) {
       const booking = {
         email: user?.emailAddresses[0].emailAddress,
         theaterId: tdata?.theaterId,
@@ -100,6 +100,7 @@ function SeatLayout() {
           toast.error("Somthing went wrong")
         })
     }
+    else{toast("Please Login",{icon:"😊"})}
   }
 
   useEffect(() => {

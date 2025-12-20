@@ -153,11 +153,13 @@ function MovieDetails() {
           {show.movie?.credits.cast.map((cast, index) => (
             <div className="flex flex-col items-center text-center" key={index}>
               <img
-                alt=""
+                alt="no"
                 className="rounded-full h-20 md:h-20 w-20 aspect-square object-cover"
-                src={'https://image.tmdb.org/t/p/w500' + cast.profile_path}
+                src={
+                  cast.profile_path==null ? "/assets/prof1.png":`https://image.tmdb.org/t/p/w500${cast.profile_path}`
+                }
               />
-              <p className="font-medium text-xs mt-3">{cast.character}</p>
+              <p className="font-medium text-xs mt-3">{cast.name}</p>
             </div>
           ))}
         </div>

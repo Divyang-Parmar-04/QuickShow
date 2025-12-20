@@ -68,7 +68,7 @@ function App() {
 
 
       } catch (error) {
-        console.error("Failed to fetch movies:", error);
+        console.error("Failed to fetch movies: ", error);
       }
     };
 

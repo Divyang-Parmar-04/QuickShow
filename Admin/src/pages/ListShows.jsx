@@ -18,7 +18,7 @@ function ListShows() {
       setShows(admin?.theater)
 
       admin?.theater.movies.map((mov) => {
-        const showBooking = admin?.bookings.filter((bok) => mov.movieId._id === bok.show._id)
+        const showBooking = admin?.bookings.filter((bok) => mov.movieId === bok.show)
         let booking = 0;
         let Earnings = 0;
         showBooking.map((book) => {

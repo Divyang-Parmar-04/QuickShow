@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react'
-import Loader from '../components/Loader';
 import { CheckIcon, DeleteIcon, Star, Ellipsis, ChevronDown, ChevronUp } from 'lucide-react';
 import kConverter from '../lib/kConverter';
 import axios from "axios"
@@ -23,7 +22,9 @@ function AddShows() {
   const [genre, setGenre] = useState(null);
   const [language, setLanguage] = useState(null);
   const [region, setRegion] = useState(null);
-  const [year , setYear] = useState('2025')
+  const [year, setYear] = useState('2025')
+  const [movieLang, setMovieLang] = useState("");
+  const [format, setFormat] = useState("");
 
 
   const id = localStorage.getItem('ownerId')
@@ -43,7 +44,7 @@ function AddShows() {
         api_key: import.meta.env.VITE_TMDB_API_KEY,
         page,
         sort_by: "primary_release_date.desc",
-        primary_release_year: year, 
+        primary_release_year: year,
       };
 
       // ✅ add only if selected
@@ -121,35 +122,6 @@ function AddShows() {
     }
   }
 
-  // function handleDateTimeAdd() {
-  //   if (!dateTimeInput) return;
-  //   const [date, time] = dateTimeInput.split("T");
-
-  //   if (!date || !time) return true;
-
-  //   setDateTimeSelection((prev) => {
-  //     const times = prev[date] || [];
-  //     if (!times.includes(time)) {
-  //       return { ...prev, [date]: [...times, time] }
-  //     }
-  //     return prev
-  //   })
-  // }
-
-  function handleRemoveTime(date, time) {
-    setDateTimeSelection((prev) => {
-      const filteredTimes = prev[date].filter((t) => t !== time);
-      if (filteredTimes.length === 0) {
-        const { [date]: _, ...rest } = prev
-        return rest
-      }
-      return {
-        ...prev,
-        [date]: filteredTimes
-      }
-    })
-  }
-
   function convertTo12Hour(time24) {
     const [hour, minute] = time24.split(":").map(Number);
     const period = hour >= 12 ? "PM" : "AM";
@@ -171,6 +143,8 @@ function AddShows() {
       price: showPrice,
       title: movieTitle,
       date: dateTimeInput.split('T')[0],
+      language:movieLang,
+      format:format,
       time: convertTo12Hour(dateTimeInput.split('T')[1])
     }
 
@@ -194,12 +168,12 @@ function AddShows() {
 
   useEffect(() => {
     const fetchMovies = async () => {
-      const movies = await discoverMovies({ genre, language, region  , year});
+      const movies = await discoverMovies({ genre, language, region, year });
       setNowPlayingMovies(movies);
     };
 
     fetchMovies();
-  }, [genre, language, region ,year]);
+  }, [genre, language, region, year]);
 
   return (
     <>
@@ -281,7 +255,7 @@ function AddShows() {
               </select>
             </div>
 
-             {/* 🌍 Year */}
+            {/* 🌍 Year */}
             <div className="inline-flex items-center gap-2 border border-gray-600 rounded-md">
               <select
                 className=" bg-gray-950 px-6 rounded-md py-2 text-white outline-none cursor-pointer"
@@ -291,7 +265,7 @@ function AddShows() {
                 <option value="2024">2024</option>
                 <option value="2025">2025</option>
                 <option value="2026">2026</option>
-               
+
               </select>
             </div>
 
@@ -309,47 +283,43 @@ function AddShows() {
           {nowPlayingMovies.length > 0 ?
 
             nowPlayingMovies.map((movie, index) => (
-              <>
-                <div
-                  key={index}
-                  className={`relative max-w-40  cursor-pointer group-hover:not-hover:opacity-40 hover:-translate-y-1 transition duration-300`}
+              <div
+                key={index}
+                className={`relative max-w-40  cursor-pointer group-hover:not-hover:opacity-40 hover:-translate-y-1 transition duration-300`}
 
-                  onClick={() => setSelectedMovie(movie.id)}
-                >
-                  <div className="relative rounded-lg overflow-hidden h-50">
-                    <img
-                      alt={movie.title}
-                      className="w-full object-cover brightness-90"
-                      src={
-                        movie.poster_path
-                          ? `https://image.tmdb.org/t/p/w500${movie.poster_path}`
-                          : "/fallback.jpg"
-                      }
-                    />
-                    <div className="text-sm flex items-center justify-between p-2 bg-black/70 w-full absolute bottom-0 left-0">
-                      <p className="flex items-center gap-1 text-gray-400">
-                        <Star className="w-4 h-4 text-primary fill-primary" />
-                        {movie.vote_average.toFixed(1)}
-                      </p>
-                      <p className="text-gray-300">{kConverter(movie.vote_count)} Votes</p>
-                    </div>
+                onClick={() => setSelectedMovie(movie.id)}
+              >
+                <div className="relative rounded-lg overflow-hidden h-50">
+                  <img
+                    alt={movie.title}
+                    className="w-full object-cover brightness-90"
+                    src={
+                      movie.poster_path
+                        ? `https://image.tmdb.org/t/p/w500${movie.poster_path}`
+                        : "/fallback.jpg"
+                    }
+                  />
+                  <div className="text-sm flex items-center justify-between p-2 bg-black/70 w-full absolute bottom-0 left-0">
+                    <p className="flex items-center gap-1 text-gray-400">
+                      <Star className="w-4 h-4 text-primary fill-primary" />
+                      {movie.vote_average.toFixed(1)}
+                    </p>
+                    <p className="text-gray-300">{kConverter(movie.vote_count)} Votes</p>
                   </div>
-                  {selectedMovie == movie.id && (
-                    <div className='absolute top-2 right-2 flex items-center justify-center bg-primary h-6 w-6 rounded '>
-                      <CheckIcon className='w-4 h-4 text-white' />
-                    </div>
-                  )}
-                  <p className="font-medium truncate">{movie.title}</p>
-                  <p className="text-gray-400 text-sm">{movie.releaseDate}</p>
                 </div>
-
-              </>
-
+                {selectedMovie == movie.id && (
+                  <div className='absolute top-2 right-2 flex items-center justify-center bg-primary h-6 w-6 rounded '>
+                    <CheckIcon className='w-4 h-4 text-white' />
+                  </div>
+                )}
+                <p className="font-medium truncate">{movie.title}</p>
+                <p className="text-gray-400 text-sm">{movie.releaseDate}</p>
+              </div>
             ))
             : (
               <>
                 {Array(5).fill(0).map((_, index) => (
-                  <SkelitonCard index={index} />
+                  <SkelitonCard index={index} key={index} />
                 ))}
               </>
             )}
@@ -360,12 +330,12 @@ function AddShows() {
       {/* setShow Price */}
       <div className="mt-8">
         <label className="block text-sm font-medium mb-2">Show Price</label>
-        <div className="inline-flex items-center gap-2 border border-gray-600 px-3 py-2 rounded-md">
-          <p className="text-gray-400 text-sm">{currency}</p>
+        <div className="inline-flex items-center gap-2 border border-gray-600 bg-gray-950 px-3 py-2 rounded-md">
+          <p className="text-white text-sm">{currency}</p>
           <input
             min="0"
             placeholder="Enter show price"
-            className="outline-none"
+            className="outline-none text-white"
             type="number"
             value={showPrice} onChange={(e) => setShowPrice(e.target.value)}
           />
@@ -375,47 +345,61 @@ function AddShows() {
       {/* SetdateAndTime */}
       <div className="mt-6">
         <label className="block text-sm font-medium mb-2">Select Date and Time</label>
-        <div className="inline-flex gap-5 border border-gray-600 p-1 pl-3 rounded-lg">
+        <div className="inline-flex gap-5 border border-gray-600 bg-gray-950 p-1 pl-3 rounded-lg">
           <input
             className="outline-none rounded-md"
             type="datetime-local"
             value={dateTimeInput}
             onChange={(e) => setDateTimeInput(e.target.value)}
-
           />
-          {/* <button className="bg-primary/80 text-white px-3 py-2 text-sm rounded-lg hover:bg-primary cursor-pointer" onClick={handleDateTimeAdd}>
-            Add Time
-          </button> */}
         </div>
       </div>
 
-      {/* Display Selected Times */}
-      {Object.keys(dateTimeSelection).length > 0 && (
-        <div className="mt-6">
-          <h2 className="mb-2">Selected Date-Time</h2>
-          <ul className="space-y-3">
-            {Object.entries(dateTimeSelection).map(([date, times]) => (
-              <li key={date}>
-                <div className="font-medium">{date}</div>
-                <div className="flex flex-wrap gap-2 mt-1 text-sm">
-                  {times.map((time) => (
-
-                    <div className="border border-primary px-2 py-1 flex items-center rounded" key={time}>
-                      <span>{time}</span>
-                      <DeleteIcon
-                        className="ml-2 text-red-500 hover:text-red-700 cursor-pointer"
-                        size={15}
-                        aria-hidden="true"
-                        onClick={() => handleRemoveTime(date, time)}
-                      />
-                    </div>
-                  ))}
-                </div>
-              </li>
-            ))}
-          </ul>
+      {/* Select Language */}
+      <div className="mt-6">
+        <label className="block text-sm font-medium mb-2">Select Language</label>
+        <div className="inline-flex gap-5 border border-gray-600 bg-gray-950 p-1 pl-3 rounded-lg">
+          <select
+            className="outline-none rounded-md bg-gray-950"
+            value={movieLang}
+            onChange={(e) => setMovieLang(e.target.value)}
+          >
+            <option value="">Choose Language</option>
+            <option value="Hindi">Hindi</option>
+            <option value="English">English</option>
+            <option value="Tamil">Tamil</option>
+            <option value="Telugu">Telugu</option>
+            <option value="Kannada">Kannada</option>
+            <option value="Malayalam">Malayalam</option>
+            <option value="Marathi">Marathi</option>
+            <option value="Gujarati">Gujarati</option>
+            <option value="Bengali">Bengali</option>
+            <option value="Punjabi">Punjabi</option>
+          </select>
         </div>
-      )}
+      </div>
+
+      {/* Select Movie Format */}
+      <div className="mt-6">
+        <label className="block text-sm font-medium mb-2">Select Format</label>
+        <div className="inline-flex gap-5 border border-gray-600 bg-gray-950 p-1 pl-3 rounded-lg">
+          <select
+            className="outline-none rounded-md bg-gray-950"
+            value={format}
+            onChange={(e) => setFormat(e.target.value)}
+          >
+            <option value="">Choose Format</option>
+            <option value="2D">2D</option>
+            <option value="3D">3D</option>
+            <option value="IMAX">IMAX</option>
+            <option value="IMAX-3D">IMAX 3D</option>
+            <option value="4DX">4DX</option>
+            <option value="DOLBY">Dolby Atmos</option>
+          </select>
+        </div>
+      </div>
+
+
 
       <button className="bg-primary text-white px-8 py-2 mt-6 rounded hover:bg-primary/90 transition-all cursor-pointer" onClick={handleAddShow}>
         Add Show

@@ -30,6 +30,7 @@ function App() {
          axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/movies/admin/${ownerId}`)
             .then((res) => {  
                dispatch(setAdminTheater(res.data))
+               console.log(res.data)
             })
             .catch((err) => {
                console.log(err); 

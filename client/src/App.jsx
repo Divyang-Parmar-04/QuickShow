@@ -55,13 +55,18 @@ function App() {
         dispatch(setTheaterData(response.data.theaters))
         // console.log(response.data.theaters)
 
-        const moviesid = response.data.theaters.flatMap(mov =>
-          mov?.movies?.map(m => m.movieId) || []
-        );
+        const moviesid = [
+          ...new Set(
+            response.data.theaters.flatMap(
+              mov => mov?.movies?.map(m => m.movieId) || []
+            )
+          )
+        ];
 
         if (moviesid.length == 0) alert("NO Movies was found on Selected Location")
         else {
 
+          // console.log(moviesid)
           const movies = await fetchMoviesByIds(moviesid)
           // console.log(movies)
 

@@ -28,7 +28,7 @@ function MovieCard({ movie,fav=false }) {
     }
 
     return (
-        <div className={`relative flex flex-col justify-between md:bg-gray-900 text-white rounded-[10px] hover:-translate-y-2 transition duration-300 w-40 md:w-60 cursor-pointer`} onMouseOver={()=>setIsHover(true)} onMouseOut={()=>setIsHover(false)}>
+        <div className={`relative flex flex-col justify-between md:bg-gray-900 text-white rounded-[10px] hover:-translate-y-2 transition duration-300 w-38 md:w-60 cursor-pointer`} onMouseOver={()=>setIsHover(true)} onMouseOut={()=>setIsHover(false)}>
             <img
                 onClick={() => { navigate(`/movies/${movie.id}`); scrollTo(0, 0) }}
                 alt=""

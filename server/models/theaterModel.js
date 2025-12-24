@@ -12,8 +12,6 @@ const theaterSchema = new mongoose.Schema({
   movies: [
     {
       movieId: {
-        // type: mongoose.Schema.Types.ObjectId,
-        // ref: 'movie',
         type:String,
         required: true,
       },
@@ -23,10 +21,15 @@ const theaterSchema = new mongoose.Schema({
       },
       show_price: { type: Number },
       occupiedSeat: { type: Object, default: {} },
+
       schedules: [
         {
-          date: { type: String, required: true }, // e.g., "2025-07-25"
-          time: { type: String, required: true }, // e.g., "9:00 PM"
+          date: { type: String, required: true }, 
+          time: { type: String, required: true },
+          languages:{type:String},
+          show_price:{type:Number},
+          format:{type:String}
+
         }
       ]
     }

@@ -71,10 +71,7 @@ const addFavoriteMovie = async (req, res) => {
 const deleteFavoriteMovie = async (req, res) => {
   try {
     const {userId,movieId} = req.body
-    console.log(userId,movieId)
-
     const user = await USER.findById(userId)
-    // console.log(user)
 
     const movieIndex = user.favorite.findIndex((mov)=>mov.id==movieId)
     if(movieIndex==-1) return res.json({msg:false})
@@ -121,10 +118,9 @@ const getBookingsByEmail = async (req, res) => {
     const { email } = req.params;
 
     // Step 2: Find bookings using the user ID and populate the movie `show`
-    const bookings = await BOOKING.find({ user: email })
-      .populate("show") // populate the referenced movie
-      .sort({ createdAt: -1 }); // optional: newest first
-
+    
+    const bookings = await BOOKING.find({ user: email }).sort({ createdAt: -1 }); // optional: newest first
+    
     return res.json({ bookings });
 
   } catch (error) {

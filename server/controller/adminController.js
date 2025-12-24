@@ -3,7 +3,7 @@ const THEATER = require("../models/theaterModel")
 
 const handleAddShow = async(req,res)=>{
   try {
-    const { theaterId, movieId, price, date, time ,title} = req.body;
+    const { theaterId, movieId, price, date, time ,title ,language,format} = req.body;
 
     const theater = await THEATER.findById(theaterId);
     if (!theater) return res.json({ msg: "Theater not found" });
@@ -19,7 +19,7 @@ const handleAddShow = async(req,res)=>{
         movie_name: title,
         show_price: price || null,
         occupiedSeat: {},
-        schedules: [{ date, time }]
+        schedules: [{ date, time , languages:language , show_price:price , format:format }]
       };
 
       theater.movies.push(movie);
@@ -27,11 +27,11 @@ const handleAddShow = async(req,res)=>{
 
       // Check for duplicate schedule
       const isDuplicate = movie.schedules?.some(
-        (s) => s.date === date && s.time === time
+        (s) => s.date === date && s.time === time 
       );
 
       if (!isDuplicate) {
-        movie.schedules.push({ date, time });
+        movie.schedules.push({ date, time , languages:language ,show_price:price, format:format});
       }
 
       if (price !== undefined && price !== null) {

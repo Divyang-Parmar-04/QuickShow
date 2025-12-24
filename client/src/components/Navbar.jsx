@@ -3,9 +3,10 @@ import { MapPin, MenuIcon, TicketPlus, XIcon } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useClerk, UserButton, useUser } from '@clerk/clerk-react'
 import { useDispatch } from 'react-redux'
-import {setlocation} from '../store/dataslice'
+import { setlocation } from '../store/dataslice'
 import axios from 'axios'
 import toast from 'react-hot-toast'
+import SideNavbar from './SideNavbar'
 
 function Navbar() {
   const dispatch = useDispatch()
@@ -19,7 +20,7 @@ function Navbar() {
 
 
   // Predefined list of locations
-  const locations = ['Ahmedabad','Mumbai', 'Delhi', 'Bengaluru', 'Hyderabad', 'Kolkata', 'Chennai']
+  const locations = ['Ahmedabad', 'Mumbai', 'Delhi', 'Bengaluru', 'Hyderabad', 'Kolkata', 'Chennai']
 
   useEffect(() => {
     const storedLocation = localStorage.getItem('location')
@@ -42,70 +43,72 @@ function Navbar() {
   }
 
   //Create new User
-  const createNewUser=()=>{
-    if(user){
-      axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/create/newUser`,{fullName:user?.fullName,email:user?.emailAddresses[0].emailAddress,id:user?.id,imageUrl:user?.imageUrl})
-      .then((res)=>{
-        if(res.data.msg=='error'){
-        return toast("Somthing went wrong",{icon:"❌"})
-        }
-        else if(res.data.msg=='exists'){
-          return
-        }
-        else{
-         return toast("Login Succsessfull",{icon:"✅"})
-        }
-      })
-      .catch((err)=>{
-        console.log(err)
-        toast("Somthing went wrong",{icon:"❌"})
-      })
+  const createNewUser = () => {
+    if (user) {
+      axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/create/newUser`, { fullName: user?.fullName, email: user?.emailAddresses[0].emailAddress, id: user?.id, imageUrl: user?.imageUrl })
+        .then((res) => {
+          if (res.data.msg == 'error') {
+            return toast("Somthing went wrong", { icon: "❌" })
+          }
+          else if (res.data.msg == 'exists') {
+            return
+          }
+          else {
+            return toast("Login Succsessfull", { icon: "✅" })
+          }
+        })
+        .catch((err) => {
+          console.log(err)
+          toast("Somthing went wrong", { icon: "❌" })
+        })
     }
   }
 
-  useEffect(()=>{
-    if(user){
+  useEffect(() => {
+    if (user) {
       createNewUser()
     }
-  },[user])
+  }, [user])
 
   return (
     <div className="fixed top-0 left-0 z-50 w-full flex items-center justify-between px-6 md:px-16 lg:px-36 py-5 ">
       <Link to="/" className="max-md:flex-1">
         <img src="/assets/logo.svg" alt="" className="w-35 h-auto" />
       </Link>
-
-      <div
-        className={`max-md:absolute max-md:top-0 max-md:left-0 max-md:font-medium max-md:text-lg z-50 flex flex-col md:flex-row items-center max-md:justify-center gap-8 min-md:px-8 py-3 max-md:h-screen min-md:rounded-full backdrop-blur bg-black/70 md:bg-white/10 md:border border-gray-300/20 overflow-hidden transition-[width] duration-300 ${
-          isOpen ? 'max-md:w-full ' : 'max-md:w-0'
-        }`}
-      >
-        <XIcon
-          className="md:hidden absolute top-6 right-6 w-6 h-6 cursor-pointer"
-          onClick={() => setIsOpen(!isOpen)}
-        />
-
-        <Link onClick={() => { scrollTo(0, 0); setIsOpen(false) }} to="/">
-          Home
-        </Link>
-        <Link onClick={() => { scrollTo(0, 0); setIsOpen(false) }} to="/movies">
-          Movies
-        </Link>
-        <Link onClick={() => { scrollTo(0, 0); setIsOpen(false) }} to="/favorite">
-          Favorites
-        </Link>
-        <Link onClick={() => { scrollTo(0, 0); setIsOpen(false) }} to={`${import.meta.env.VITE_ADMIN_URL}`}>
-          DashBoard
-        </Link>
-        <button
-          className="flex gap-1 items-center cursor-pointer"
-          onClick={() => setIsLocationCardOpen(true)}
+     
+      {/* <div
+          className={`max-md:absolute max-md:top-0 max-md:left-0 max-md:font-medium max-md:text-lg z-50 flex flex-col md:flex-row items-center max-md:justify-center gap-8 min-md:px-8 py-3 max-md:h-screen min-md:rounded-full backdrop-blur bg-black/70 md:bg-white/10 md:border border-gray-300/20 overflow-hidden transition-[width] duration-300 ${isOpen ? 'max-md:w-full ' : 'max-md:w-0'
+            }`}
         >
-          <MapPin className="invert w-5" />
-          {location || 'Select Location'}
-        </button>
-      </div>
+          <XIcon
+            className="md:hidden absolute top-6 right-6 w-6 h-6 cursor-pointer"
+            onClick={() => setIsOpen(!isOpen)}
+          />
 
+          <Link onClick={() => { scrollTo(0, 0); setIsOpen(false) }} to="/">
+            Home
+          </Link>
+          <Link onClick={() => { scrollTo(0, 0); setIsOpen(false) }} to="/movies">
+            Movies
+          </Link>
+          <Link onClick={() => { scrollTo(0, 0); setIsOpen(false) }} to="/favorite">
+            Favorites
+          </Link>
+          <Link onClick={() => { scrollTo(0, 0); setIsOpen(false) }} to={`${import.meta.env.VITE_ADMIN_URL}`}>
+            DashBoard
+          </Link>
+          <button
+            className="flex gap-1 items-center cursor-pointer"
+            onClick={() => setIsLocationCardOpen(true)}
+          >
+            <MapPin className="text-blue-400 w-5" />
+            {location || 'Select Location'}
+          </button>
+        </div>
+     */}
+
+      <SideNavbar isOpen={isOpen} setIsOpen={setIsOpen} location={location} setIsLocationCardOpen={setIsLocationCardOpen}/>
+  
       {/* Location Card Pop-up */}
       {isLocationCardOpen && (
         <div className="fixed top-0 left-0 w-full inset-0 z-60 bg-black/50 flex justify-center">
@@ -119,14 +122,14 @@ function Navbar() {
                 onClick={() => setIsLocationCardOpen(false)}
               />
             </div>
-            <div className="flex overflow-auto">
+            <div className="flex overflow-auto ">
               {locations.map((loc) => (
                 <button
                   key={loc}
-                  className="flex items-center gap-2 p-2 hover:bg-gray-100 rounded-md"
+                  className="flex items-center gap-2 p-2 hover:bg-gray-100 rounded-md cursor-pointer"
                   onClick={() => handleLocationSelect(loc)}
                 >
-                  <MapPin className="w-5 h-5 text-gray-600" />
+                  <MapPin className="w-5 h-5 text-gray-800" />
                   <span>{loc}</span>
                 </button>
               ))}
@@ -139,9 +142,9 @@ function Navbar() {
         {!user ? (
           <button
             className="px-4 py-1 sm:px-7 sm:py-3 bg-primary hover:bg-primary-dull transition rounded-full font-medium cursor-pointer"
-            onClick={()=>{
+            onClick={() => {
               openSignIn(),
-              createNewUser()
+                createNewUser()
             }}
           >
             Login

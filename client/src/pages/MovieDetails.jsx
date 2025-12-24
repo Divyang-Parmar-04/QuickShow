@@ -26,6 +26,7 @@ function MovieDetails() {
   const [show, setShow] = useState(null);
   const [thID, setThId] = useState()
   const [traillerLink, setTraillerLink] = useState('')
+  const [movieInfo , setMovieInfo] = useState({})
 
   //favorite
   function checkFavorite() {
@@ -45,20 +46,61 @@ function MovieDetails() {
 
   function handleAddToFavorite() {
     if (user && id) {
-      
+
       axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/movie/favorite`, { userId: user?.id, id: id, newMovie: true })
         .then((res) => {
-          toast("movie Add to Favorite", { icon: "✅" })
+          toast("Movie added to Favorite", {
+            icon: "✅",
+            onClick: (t) => toast.dismiss(t.id),
+            style: {
+              cursor: "pointer",
+            },
+          })
           setFavorite(true)
         })
         .catch((err) => {
           toast("Somthing went wrong", { icon: "❌" })
         })
     }
-    else{
-      toast("Please Login",{icon:"😊"})
+    else {
+      toast("Please Login", { icon: "😊" })
     }
   }
+
+  const extractFormatsAndLanguages = (theaters) => {
+  const formats = new Set();
+  const languages = new Set();
+
+  theaters.forEach(theater => {
+    theater.movies?.forEach(movie => {
+      movie.schedules?.forEach(schedule => {
+
+        // format
+        if (Array.isArray(schedule.format)) {
+          schedule.format.forEach(f => formats.add(f));
+        } else if (schedule.format) {
+          formats.add(schedule.format);
+        }
+
+        // language
+        if (Array.isArray(schedule.languages)) {
+          schedule.languages.forEach(l => languages.add(l));
+        } else if (schedule.languages) {
+          languages.add(schedule.languages);
+        }
+
+      });
+    });
+  });
+
+  return {
+    formats: Array.from(formats),
+    languages: Array.from(languages)
+  };
+};
+
+
+
 
   useEffect(() => {
     // console.log(data)
@@ -78,6 +120,9 @@ function MovieDetails() {
       .filter((th) => th !== null);
 
     setShow({ movie: movie, TheaterData: thdata });
+    // console.log(thdata)
+
+    setMovieInfo(extractFormatsAndLanguages(thdata))
 
     const link = movie?.videos?.results?.find((vid) => vid.type === "Trailer" && vid.site === "YouTube");
     setTraillerLink(`https://www.youtube.com/watch?v=${link?.key}`)
@@ -94,14 +139,14 @@ function MovieDetails() {
   }, [id, user])
 
   return show != null ? (
-    <div className="px-6 md:px-16 lg:px-40 pt-30 md:pt-50">
+    <div className="px-6 md:px-16 lg:px-40 pt-30 md:pt-50 mb-30">
       {/* Movie Details Header */}
       <div className="flex flex-col md:flex-row gap-8 max-w-6xl mx-auto">
         <img
 
           className="max-md:mx-auto rounded-xl h-104 max-w-70 object-cover"
           src={
-            show.movie?.poster_path!=null
+            show.movie?.poster_path != null
               ? `https://image.tmdb.org/t/p/w500${show.movie.poster_path}`
               : "/assets/profile.png"
           }
@@ -143,6 +188,16 @@ function MovieDetails() {
               </button>
             )}
           </div>
+          <div className='flex gap-2 mt-5'>
+            {movieInfo.formats.length>0 && movieInfo.formats?.map((format,index)=>(
+              <span className='bg-gray-600 px-2 rounded-full' key={index}>{format}</span>
+            ))}
+            {movieInfo.languages.length>0 && movieInfo.languages.map((lang,index)=>(
+              <span className='bg-gray-600 px-2 rounded-full' key={index}>{lang}</span>
+            ))}
+          </div>
+
+
         </div>
       </div>
 
@@ -156,7 +211,7 @@ function MovieDetails() {
                 alt="no"
                 className="rounded-full h-20 md:h-20 w-20 aspect-square object-cover"
                 src={
-                  cast.profile_path==null ? "/assets/prof1.png":`https://image.tmdb.org/t/p/w500${cast.profile_path}`
+                  cast.profile_path == null ? "/assets/prof1.png" : `https://image.tmdb.org/t/p/w500${cast.profile_path}`
                 }
               />
               <p className="font-medium text-xs mt-3">{cast.name}</p>

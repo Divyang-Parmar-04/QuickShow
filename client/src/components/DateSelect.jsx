@@ -24,12 +24,19 @@ function DateSelect({ movie, id , theaterId }) {
             .filter(s => s.date === selected)
             .map(s => s.time);
 
+        const showLanguage = movie.schedules.filter(s=>s.date===selected).map(s=>s.languages)
+        const showFormat = movie.schedules.filter(s=>s.date===selected).map(s=>s.format)
+        const showPrice = movie.schedules.filter(s=>s.date===selected).map(s=>s.show_price)
+
         dispatch(setShow({
             movieId: movie.movieId,
             movieName: movie.movie_name,
             theaterId:theaterId,
             date: selected,
             timing: showTimings,
+            languages:showLanguage,
+            format:showFormat,
+            price:showPrice
         }));
 
 

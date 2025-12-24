@@ -25,12 +25,12 @@ function TheaterPage({ theaters, onUpdateTheater }) {
 
   return (
     <div id="dateSelect" className="pt-4  ">
-      <div className={`p-4 flex gap-3 relative rounded-[10px] ${screenWidth<640 && "overflow-auto flex-col h-40  flex-wrap" }`}>
+      <div className={`p-4 flex gap-3 relative rounded-[10px] ${screenWidth<640 && "overflow-x-auto flex-col h-40  flex-wrap" }`}>
         {theaters.map((theater, index) => (
           <div
           key={index}
           onClick={() => { handleOnTheaterClick(theater._id, theater.movies[0]) }}
-          className={`flex p-2 pt-1 rounded-[10px] shadow-md border-3 transition-all cursor-pointer hover:shadow-lg w-70 h-40 text-white relative ${selectedTheater === theater?._id ? 'border-blue-500' : 'border-gray-200'
+          className={`flex p-2 pt-1 rounded-[10px] shadow-md border-3 transition-all cursor-pointer hover:shadow-lg md:w-70 w-60 h-40 text-white relative ${selectedTheater === theater?._id ? 'border-blue-500' : 'border-gray-200'
           } `}
           >
           <div className="absolute inset-0 bg-black/60 rounded-[8px] "></div>

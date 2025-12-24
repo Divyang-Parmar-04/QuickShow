@@ -4,6 +4,7 @@ import { PlayCircleIcon } from 'lucide-react';
 import BlurCircle from './BlurCircle';
 import { useSelector } from 'react-redux';
 import Loader from './Loader';
+import TrailerSkeleton from './TrailerSkeleton';
 
 function TrailerSection() {
 
@@ -62,7 +63,7 @@ function TrailerSection() {
                     ))}
                 </div>
             </>
-        ) : (<Loader />)}
+        ) : (<TrailerSkeleton />)}
     </div>
 )
 

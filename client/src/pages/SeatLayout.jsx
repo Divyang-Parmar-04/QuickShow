@@ -132,12 +132,13 @@ function SeatLayout() {
       <div className="w-60 bg-primary/10 border border-primary/20 rounded-lg py-10 h-max md:sticky md:top-30">
         <p className="text-lg font-semibold px-6">Available Timings</p>
         <div className="mt-5 space-y-1">
-          {show.dateTime.timing.map((item) => (
+          {show.dateTime.timing.map((item,index) => (
             <div className={`flex items-center gap-2 px-6 py-2 w-max rounded-r-md cursor-pointer transition ${selectedTime === item ? "bg-primary text-white" : "hover:bg-primary/20"}`}
-
               onClick={() => setSelectedTime(item)} key={item}>
               <ClockIcon className="w-4 h-4" />
               <p className="text-sm">{item}</p>
+              <p className="bg-red-500 rounded px-1">{show?.dateTime?.format[index]}</p>
+              <p>{show?.dateTime?.languages[index]}</p>
             </div>
           ))}
         </div>

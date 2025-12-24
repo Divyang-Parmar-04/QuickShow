@@ -53,6 +53,7 @@ function App() {
       try {
         const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/movies/location/${location}`);
         dispatch(setTheaterData(response.data.theaters))
+        // console.log(response.data.theaters)
 
         const moviesid = response.data.theaters.flatMap(mov =>
           mov?.movies?.map(m => m.movieId) || []
@@ -62,6 +63,7 @@ function App() {
         else {
 
           const movies = await fetchMoviesByIds(moviesid)
+          // console.log(movies)
 
           dispatch(setMoviesData(movies))
         }

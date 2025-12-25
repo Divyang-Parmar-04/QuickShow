@@ -41,8 +41,6 @@ function App() {
     }
   };
 
-
-
   useEffect(() => {
     if (!location) {
       dispatch(setlocation(loc))
@@ -53,25 +51,29 @@ function App() {
       try {
         const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/movies/location/${location}`);
         dispatch(setTheaterData(response.data.theaters))
-        // console.log(response.data.theaters)
+        // console.log(response.data)
 
-        const moviesid = [
-          ...new Set(
-            response.data.theaters.flatMap(
-              mov => mov?.movies?.map(m => m.movieId) || []
-            )
-          )
-        ];
-
-        if (moviesid.length == 0) alert("NO Movies was found on Selected Location")
+        if (response.data.movies.length == 0) alert("NO Movies was found on Selected Location")
         else {
-
-          // console.log(moviesid)
-          const movies = await fetchMoviesByIds(moviesid)
-          // console.log(movies)
-
-          dispatch(setMoviesData(movies))
+          dispatch(setMoviesData(response.data.movies))
         }
+
+        // const moviesid = [
+        //   ...new Set(
+        //     response.data.theaters.flatMap(
+        //       mov => mov?.movies?.map(m => m.movieId) || []
+        //     )
+        //   )
+        // ];
+
+        // if (moviesid.length == 0) alert("NO Movies was found on Selected Location")
+        // else {
+
+        //   // console.log(moviesid)
+
+        //   console.log(movies)
+
+        // }
 
 
       } catch (error) {

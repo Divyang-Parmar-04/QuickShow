@@ -1,5 +1,11 @@
 const BOOKING = require("../models/movieBooking")
 const USER = require("../models/userModel")
+const axios = require("axios");
+const pLimit = require("p-limit").default;
+const dotenv = require('dotenv');
+dotenv.config();
+
+const limit = pLimit(4); // max 4 concurrent requests
 
 //new User Create
 const newUserCreate = async (req, res) => {
@@ -70,17 +76,17 @@ const addFavoriteMovie = async (req, res) => {
 
 const deleteFavoriteMovie = async (req, res) => {
   try {
-    const {userId,movieId} = req.body
+    const { userId, movieId } = req.body
     const user = await USER.findById(userId)
 
-    const movieIndex = user.favorite.findIndex((mov)=>mov.id==movieId)
-    if(movieIndex==-1) return res.json({msg:false})
+    const movieIndex = user.favorite.findIndex((mov) => mov.id == movieId)
+    if (movieIndex == -1) return res.json({ msg: false })
 
-    user.favorite.splice(movieIndex,1);
-    
+    user.favorite.splice(movieIndex, 1);
+
     await user.save()
 
-    return res.json({msg:true})
+    return res.json({ msg: true })
 
   } catch (error) {
     console.log(error)
@@ -118,9 +124,9 @@ const getBookingsByEmail = async (req, res) => {
     const { email } = req.params;
 
     // Step 2: Find bookings using the user ID and populate the movie `show`
-    
+
     const bookings = await BOOKING.find({ user: email }).sort({ createdAt: -1 }); // optional: newest first
-    
+
     return res.json({ bookings });
 
   } catch (error) {
@@ -129,7 +135,39 @@ const getBookingsByEmail = async (req, res) => {
   }
 };
 
+//GET All MOVIES
+const fetchMoviesByIds = async (ids = []) => {
+  if (!Array.isArray(ids) || ids.length === 0) return [];
+
+  const uniqueIds = [...new Set(ids)];
+
+  const requests = uniqueIds.map(id =>
+    limit(async () => {
+      try {
+        const res = await axios.get(
+          `https://api.themoviedb.org/3/movie/${id}`,
+          {
+            params: {
+              api_key: process.env.TMDB_API_KEY,
+              append_to_response: "credits,videos",
+            },
+            timeout: 20000, // increased timeout
+          }
+        );
+        return res.data;
+      } catch (err) {
+        console.error(`TMDB failed for ID ${id}`);
+        return null; // don’t break all requests
+      }
+    })
+  );
+
+  const results = await Promise.all(requests);
+  return results.filter(Boolean); // remove failed ones
+};
 
 
 
-module.exports = { newUserCreate, addFavoriteMovie, getFavoriteMovieIds, getBookingsByEmail,deleteFavoriteMovie }
+
+
+module.exports = { newUserCreate, addFavoriteMovie, getFavoriteMovieIds, getBookingsByEmail, deleteFavoriteMovie ,fetchMoviesByIds }

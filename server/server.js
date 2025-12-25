@@ -35,12 +35,18 @@ connectDB()
     console.error("DB connection failed:", err);
   });
 
-//  Development: run normally
-if (process.env.NODE_ENV !== "production") {
-  app.listen(PORT, "0.0.0.0", () =>
-    console.log(`Server started at http://localhost:${PORT}`)
-  );
-}
+// //  Development: run normally
+// if (process.env.NODE_ENV !== "production") {
+//   app.listen(PORT, "0.0.0.0", () =>
+//     console.log(`Server started at http://localhost:${PORT}`)
+//   );
+// }
+
+// ✅ ALWAYS listen (Railway requires this)
+app.listen(PORT, "0.0.0.0", () => {
+  console.log(`🚀 Server running on port ${PORT}`);
+});
+
 // Export the app (Vercel will handle it)
 module.exports = app;
 
@@ -97,7 +103,7 @@ cron.schedule("0 0 * * *", async () => {
         _id: { $in: expiredBookingIds },
       });
 
-      console.log("🗑️ Deleted", bookingCleanup.deletedCount,"expired bookings");
+      console.log("🗑️ Deleted", bookingCleanup.deletedCount, "expired bookings");
 
     } else {
       console.log("ℹ️ No expired bookings found");

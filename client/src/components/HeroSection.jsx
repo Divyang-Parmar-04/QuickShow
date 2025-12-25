@@ -13,6 +13,7 @@ function HeroSection() {
   // console.log(mData)
 
   const [movie, setMovie] = useState(null)
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 600);
 
   useEffect(() => {
     if (mData) {
@@ -21,11 +22,26 @@ function HeroSection() {
     }
   }, [mData])
 
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 600);
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  const bgImage = isMobile
+    ? movie?.poster_path
+    : movie?.backdrop_path;
+
 
   return (
     <>
       {movie ? (
-        <div className={`flex flex-col items-start justify-center gap-4 px-6 md:px-16 lg:px-36 bg-cover bg-center h-screen `} style={{ backgroundImage: `url(https://image.tmdb.org/t/p/original${movie?.backdrop_path})` }}>
+        <div className={`flex flex-col items-start justify-center gap-4 px-6 md:px-16 lg:px-36 bg-cover bg-center h-screen `} style={{ backgroundImage: bgImage
+          ? `url(https://image.tmdb.org/t/p/original${bgImage})`
+          : "none", }}>
           <div className="absolute inset-0 bg-black/50">
           </div>
           <img

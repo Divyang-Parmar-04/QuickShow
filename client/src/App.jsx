@@ -27,7 +27,7 @@ function App() {
         axios.get(`${BASE_URL}/movie/${id}`, {
           params: {
             api_key: API_KEY,
-            append_to_response: "credits,videos"
+            append_to_response: "credits,videos"  
           }
         })
       );
@@ -42,6 +42,7 @@ function App() {
   };
 
   useEffect(() => {
+
     if (!location) {
       dispatch(setlocation(loc))
       return;
@@ -51,7 +52,7 @@ function App() {
       try {
         const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/movies/location/${location}`);
         dispatch(setTheaterData(response.data.theaters))
-        // console.log(response.data)
+        console.log(response.data)
 
         if (response.data.movies.length == 0) alert("NO Movies was found on Selected Location")
         else {

@@ -53,7 +53,6 @@ function App() {
       try {
         const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/movies/location/${location}`);
         dispatch(setTheaterData(response.data.theaters))
-        console.log(response.data)
 
         if (response.data.movies.length == 0) alert("NO Movies was found on Selected Location")
         else {

@@ -15,6 +15,7 @@ const ETicket = ({ booking }) => {
         pdf.save("QuickShow-Ticket.pdf")
     }
 
+
     return (
         <div className="flex justify-center relative">
             <div
@@ -78,12 +79,12 @@ const ETicket = ({ booking }) => {
 
                 {/* Download Button */}
                 <div className="flex justify-center m-2">
-                    <button
+                    {/* <button
                         onClick={downloadTicket}
                         className="px-8 py-2 rounded-3xl bg-black text-white  cursor-pointer"
                     >
                         <DownloadIcon />
-                    </button>
+                    </button> */}
                 </div>
 
                 <button className="absolute right-0 top-0 bg-red-500 text-white rounded-tr-3xl cursor-pointer p-1" onClick={() => booking.onHandleCloseTiketView()}><X /></button>

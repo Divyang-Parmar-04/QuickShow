@@ -21,9 +21,27 @@ const MyBookings = () => {
   const [loading, setLoading] = useState(true);
   const [isTiketView, setIsTiketView] = useState(false)
 
+  const [lang,setLang] = useState('')
+  const [format,setFormat] = useState('')
+
   const [bookShows, setBookShows] = useState([])
 
   const { user } = useUser()
+
+  function handleGetBookingData(index) {
+    setIsTiketView(true),
+    setMovieID(index)
+    
+    const th = theater.find((th)=>th._id==bookings[index].theater)
+
+    const show = th.movies.find((mov)=>mov.movieId==bookShows[movieID].id)
+  
+    const schedules = show.schedules.find((sc)=>sc.time==bookings[movieID].showDateTime.split(" ")[1] +" "+bookings[movieID].showDateTime.split(" ")[2])
+
+    setLang(schedules.languages)
+    setFormat(schedules.format)
+
+  }
 
   useEffect(() => {
 
@@ -102,8 +120,8 @@ const MyBookings = () => {
           <ETicket
             booking={{
               movie: `${bookShows[movieID]?.title}`,
-              language: `${bookShows[movieID].original_language}`,
-              format: "2D",
+              language: `${lang}`,
+              format: `${format}`,
               date: `${bookings[movieID].showDateTime.split(" ")[0]} | ${bookings[movieID].showDateTime.split(" ")[1]} ${bookings[movieID].showDateTime.split(" ")[2]} `,
               theater: `${(theater.find((th) => th._id == bookings[movieID]?.theater).theater_name)}`,
               screen: "SCREEN 1",
@@ -135,9 +153,11 @@ const MyBookings = () => {
             </div>
           </div>
           <div className="flex items-center">
-            <button
-              className="bg-primary px-4 py-1.5 mb-3 text-sm rounded-full font-medium cursor-pointer absolute lg:top-15 lg:left-100 md:left-100 md:top-15 top-80 left-50" onClick={() => { setIsTiketView(true), setMovieID(index) }}>View Tiket
-            </button>
+            {booking.isPaid && (
+              <button
+                className="bg-primary px-4 py-1.5 mb-3 text-sm rounded-full font-medium cursor-pointer absolute lg:top-15 lg:left-100 md:left-100 md:top-15 top-80 left-50" onClick={() => { handleGetBookingData(index) }}>View Tiket
+              </button>
+            )}
           </div>
           <div className="flex flex-col md:items-end md:text-right justify-between p-4">
             <div className="flex items-center gap-4">

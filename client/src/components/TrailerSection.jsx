@@ -42,11 +42,11 @@ function TrailerSection() {
                     />
                 </div>
 
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 md:gap-8 mt-8 max-w-4xl mx-auto md:h-30 h-70 p-2 overflow-x-auto">
-                    {Array(6).fill(0).map((trailer, index) => (
+                <div className="flex flex-wrap justify-center overflow-x-auto gap-3 md:gap-8 mt-8 px-2 max-w-4xl h-22 md:h-32 md:py-2 mx-auto scrollbar-hide ">
+                    {Array(movieTrailler?.moviesInfo.length).fill(0).map((trailer, index) => (
                         <div
                             key={index}
-                            className="relative hover:-translate-y-1 duration-300 transition cursor-pointer"
+                            className="relative hover:-translate-y-1 duration-300 transition cursor-pointer w-36 md:w-45 "
                             onClick={() => setCurrentTrailer(index)}
                         >
                             <img

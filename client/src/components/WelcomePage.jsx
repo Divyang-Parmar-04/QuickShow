@@ -41,13 +41,7 @@ function WelcomePage() {
                     </span>
                 </div>
 
-                {/* CTA Button */}
-                <button
-                    className="flex items-center gap-2 px-8 py-3 bg-primary hover:bg-primary-dull transition rounded-full font-medium z-20"
-                    onClick={() => navigate("/movies")}
-                >
-                    Explore Movies
-                </button>
+               
             </div>
         );
 }

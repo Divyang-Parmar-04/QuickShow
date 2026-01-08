@@ -70,7 +70,7 @@ router.post("/api/create/booking", createBooking)
 router.get("/api/payment-status/:sessionId", checkPaymentStatus);
 
 router.get("/api/booking/occupiedseat/:thaeterid/:showId", getOccupiedSeats)
-
+ 
 //GET NOWPLAYING MOVIES FOR ADMIN
 
 router.get("/api/admin/tmdb/movies", getNowPlayingMovies)
@@ -99,19 +99,38 @@ router.get("/api/admin/tmdb/search", async (req, res) => {
 
 router.get("/api/admin/tmdb/search/id", async (req, res) => {
   try {
-    const ids = req.query
+    const { ids } = req.query;
 
-    if (ids) {
-      movies = await fetchMoviesByIds(ids);
-      return res.json({ data: movies,msg:"True" })
+    if (!ids) {
+      return res.status(400).json({
+        data: [],
+        msg: "Movie IDs are required",
+      });
     }
 
-    return res.json({data:[],msg:"NO Movies Found"})
+    const movieIds = ids
+      .split(",")
+      .map((id) => id.trim())
+      .filter(Boolean);
 
+    if (movieIds.length === 0) {
+      return res.json({ data: [], msg: "No valid IDs provided" });
+    }
+
+    const movies = await fetchMoviesByIds(movieIds);
+
+    return res.json({
+      data: movies,
+      msg: "Success",
+    });
   } catch (error) {
-    console.log(error)
-    return res.json({ data: [], msg: error })
+    console.error(error);
+    return res.status(500).json({
+      data: [],
+      msg: "Failed to fetch movies",
+    });
   }
-})
+});
+
 
 module.exports = router

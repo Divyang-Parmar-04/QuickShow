@@ -2,10 +2,12 @@ const express = require('express')
 const router = express.Router()
 
 const THEATER = require("../models/theaterModel.js");
-const { createBooking, getOccupiedSeats } = require('../controller/bookingController.js');
 const BOOKING = require('../models/movieBooking.js');
+
+const { createBooking, getOccupiedSeats } = require('../controller/bookingController.js');
 const { checkPaymentStatus } = require('../controller/stripePaymentValidation.js');
-const {fetchMoviesByIds} = require("../controller/userController.js")
+const { fetchMoviesByIds } = require("../controller/userController.js");
+const { getNowPlayingMovies, discoverMovies, searchMovieByName } = require('../controller/adminController.js');
 
 //GETING MOVIES LIST AND THEATER LIST FOR USER
 router.get("/api/movies/location/:location", async (req, res) => {
@@ -48,19 +50,18 @@ router.get("/api/movies/location/:location", async (req, res) => {
 
 //GETING SHOWS,THEATER,BOOKIGS,INFORMATION
 router.get('/api/movies/admin/:id', async (req, res) => {
-    try {
-        const { id } = req.params
-        const theater = await THEATER.findById(id);
-        const booking = await BOOKING.find({ theater: id })
+  try {
+    const { id } = req.params
+    const theater = await THEATER.findById(id);
+    const booking = await BOOKING.find({ theater: id })
 
-        return res.json({ theater: theater, bookings: booking })
+    return res.json({ theater: theater, bookings: booking })
 
-    } catch (error) {
-        console.log(error)
-        return res.json({ movies: "error" })
-    }
+  } catch (error) {
+    console.log(error)
+    return res.json({ movies: "error" })
+  }
 })
-
 
 //BOOKING ROUTES 
 router.post("/api/create/booking", createBooking)
@@ -69,5 +70,48 @@ router.post("/api/create/booking", createBooking)
 router.get("/api/payment-status/:sessionId", checkPaymentStatus);
 
 router.get("/api/booking/occupiedseat/:thaeterid/:showId", getOccupiedSeats)
+
+//GET NOWPLAYING MOVIES FOR ADMIN
+
+router.get("/api/admin/tmdb/movies", getNowPlayingMovies)
+
+// Discover movies
+router.get("/api/admin/tmdb/discover", async (req, res) => {
+  try {
+    const movies = await discoverMovies(req.query);
+    res.json({ results: movies });
+  } catch (error) {
+    res.status(500).json({ message: "Failed to fetch movies" });
+  }
+});
+
+// Search movie by name
+router.get("/api/admin/tmdb/search", async (req, res) => {
+  try {
+    const movies = await searchMovieByName(req.query.q);
+    res.json({ results: movies });
+  } catch (error) {
+    res.status(500).json({ message: "Search failed" });
+  }
+});
+
+//GET MOVIES BY ID
+
+router.get("/api/admin/tmdb/search/id", async (req, res) => {
+  try {
+    const { ids } = req.body
+
+    if (ids) {
+      movies = await fetchMoviesByIds(ids);
+      return res.json({ data: movies,msg:"True" })
+    }
+
+    return res.json({data:[],msg:"NO Movies Found"})
+
+  } catch (error) {
+    console.log(error)
+    return res.json({ data: [], msg: error })
+  }
+})
 
 module.exports = router

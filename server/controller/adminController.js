@@ -1,9 +1,12 @@
 const USER = require("../models/userModel")
 const THEATER = require("../models/theaterModel")
 
-const handleAddShow = async(req,res)=>{
+const API_KEY = process.env.TMDB_API_KEY;
+const BASE_URL = "https://api.themoviedb.org/3";
+
+const handleAddShow = async (req, res) => {
   try {
-    const { theaterId, movieId, price, date, time ,title ,language,format} = req.body;
+    const { theaterId, movieId, price, date, time, title, language, format } = req.body;
 
     const theater = await THEATER.findById(theaterId);
     if (!theater) return res.json({ msg: "Theater not found" });
@@ -19,7 +22,7 @@ const handleAddShow = async(req,res)=>{
         movie_name: title,
         show_price: price || null,
         occupiedSeat: {},
-        schedules: [{ date, time , languages:language , show_price:price , format:format }]
+        schedules: [{ date, time, languages: language, show_price: price, format: format }]
       };
 
       theater.movies.push(movie);
@@ -27,11 +30,11 @@ const handleAddShow = async(req,res)=>{
 
       // Check for duplicate schedule
       const isDuplicate = movie.schedules?.some(
-        (s) => s.date === date && s.time === time 
+        (s) => s.date === date && s.time === time
       );
 
       if (!isDuplicate) {
-        movie.schedules.push({ date, time , languages:language ,show_price:price, format:format});
+        movie.schedules.push({ date, time, languages: language, show_price: price, format: format });
       }
 
       if (price !== undefined && price !== null) {
@@ -48,8 +51,8 @@ const handleAddShow = async(req,res)=>{
   }
 }
 
-const handleDeleteShow = async(req,res)=>{
-    try {
+const handleDeleteShow = async (req, res) => {
+  try {
     const { mId, tId, sIndex } = req.body;
 
     const theater = await THEATER.findById(tId);
@@ -79,4 +82,66 @@ const handleDeleteShow = async(req,res)=>{
   }
 }
 
-module.exports = {handleAddShow,handleDeleteShow}
+const getNowPlayingMovies = async (req, res) => {
+  try {
+
+    const url = `https://api.themoviedb.org/3/movie/popular?api_key=${API_KEY}&region=IN&with_original_language=hi|ta|te|ml|kn`;
+
+    const response = await fetch(url)
+    const data = await response.json()
+
+    return res.json({ data: data })
+
+  } catch (error) {
+    console.log(error)
+    return res.json({ data: [], msg: error })
+  }
+}
+
+const discoverMovies = async ({
+  genre,
+  language,
+  region,
+  year,
+  page = 1,
+}) => {
+  try {
+    const params = {
+      api_key: API_KEY,
+      page,
+      sort_by: "primary_release_date.desc",
+    };
+
+    if (year) params.primary_release_year = year;
+    if (genre) params.with_genres = genre;
+    if (language) params.with_original_language = language;
+    if (region) params.region = region;
+
+    const res = await axios.get(`${BASE_URL}/discover/movie`, { params });
+    return res.data.results || [];
+  } catch (err) {
+    console.error("Discover error:", err.message);
+    return [];
+  }
+};
+
+const searchMovieByName = async (query) => {
+  if (!query) return [];
+
+  try {
+    const res = await axios.get(`${BASE_URL}/search/movie`, {
+      params: {
+        api_key: API_KEY,
+        query,
+        include_adult: false,
+      },
+    });
+    return res.data.results || [];
+  } catch (err) {
+    console.error("Search error:", err.message);
+    return [];
+  }
+};
+
+
+module.exports = { handleAddShow, handleDeleteShow, getNowPlayingMovies ,discoverMovies,searchMovieByName}

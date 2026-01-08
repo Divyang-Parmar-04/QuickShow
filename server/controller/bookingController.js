@@ -139,4 +139,6 @@ const getOccupiedSeats = async (req, res) => {
 }
 
 
+
+
 module.exports = { getOccupiedSeats, createBooking }

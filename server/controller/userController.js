@@ -155,7 +155,9 @@ const fetchMoviesByIds = async (ids = []) => {
           }
         );
         return res.data;
+
       } catch (err) {
+        console.log(err)
         console.error(`TMDB failed for ID ${id}`);
         return null; // don’t break all requests
       }
@@ -165,7 +167,6 @@ const fetchMoviesByIds = async (ids = []) => {
   const results = await Promise.all(requests);
   return results.filter(Boolean); // remove failed ones
 };
-
 
 
 

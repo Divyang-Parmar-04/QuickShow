@@ -26,63 +26,38 @@ function AddShows() {
   const [movieLang, setMovieLang] = useState("");
   const [format, setFormat] = useState("");
 
+  const [firstload,setFirstLoad] = useState(true)
+
 
   const id = localStorage.getItem('ownerId')
 
   //discover movies by fillters
-  const discoverMovies = async ({
-    genre,
-    language,
-    region,
-    year,
-    page = 1,
-  }) => {
-
+  const discoverMovies = async (filters) => {
     setNowPlayingMovies([])
     try {
-      const params = {
-        api_key: import.meta.env.VITE_TMDB_API_KEY,
-        page,
-        sort_by: "primary_release_date.desc",
-        primary_release_year: year,
-      };
-
-      // ✅ add only if selected
-      if (genre) params.with_genres = genre;
-      if (language) params.with_original_language = language;
-      if (region) params.region = region;
-
-      const res = await axios.get(
-        "https://api.themoviedb.org/3/discover/movie",
-        { params }
-      );
+      const res = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/admin/tmdb/discover`, {
+        params: filters,
+      });
 
       return res.data.results || [];
+      
     } catch (error) {
       console.error("Discover error:", error);
       return [];
     }
+    
   };
 
-
   const searchMovieByName = async (query) => {
-    if (!query) return [];
+    if (!query?.trim()) return [];
 
     try {
-      const res = await axios.get(
-        "https://api.themoviedb.org/3/search/movie",
-        {
-          params: {
-            api_key: import.meta.env.VITE_TMDB_API_KEY,
-            query,
-            include_adult: false,
-          },
-        }
-      );
-
+      const res = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/admin/tmdb/search`, {
+        params: { q: query },
+      });
       return res.data.results || [];
     } catch (error) {
-      console.error("Search error:", error.response?.data || error);
+      console.error("Search error:", error);
       return [];
     }
   };
@@ -104,22 +79,16 @@ function AddShows() {
 
   async function fetchNowPlayingMovies() {
 
-    // const allMovies = admin?.movies || [];
     setNowPlayingMovies([]);
-
     try {
 
-      const API_KEY = import.meta.env.VITE_TMDB_API_KEY;
-      const url = `https://api.themoviedb.org/3/movie/popular?api_key=${API_KEY}&region=IN&with_original_language=hi|ta|te|ml|kn`;
-
-      const response = await fetch(url)
-      const data = await response.json()
-
-      setNowPlayingMovies(data.results)
+      const res = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/admin/tmdb/movies`)
+      setNowPlayingMovies(res.data.data.results)
 
     } catch (error) {
       console.log(error)
     }
+    setFirstLoad(false)
   }
 
   function convertTo12Hour(time24) {
@@ -143,8 +112,8 @@ function AddShows() {
       price: showPrice,
       title: movieTitle,
       date: dateTimeInput.split('T')[0],
-      language:movieLang,
-      format:format,
+      language: movieLang,
+      format: format,
       time: convertTo12Hour(dateTimeInput.split('T')[1])
     }
 
@@ -171,8 +140,8 @@ function AddShows() {
       const movies = await discoverMovies({ genre, language, region, year });
       setNowPlayingMovies(movies);
     };
+    if(!firstload)fetchMovies();
 
-    fetchMovies();
   }, [genre, language, region, year]);
 
   return (
@@ -280,7 +249,7 @@ function AddShows() {
       <div className={`pb-4 mt-2 ${isDown ? " flex w-270" : "overflow-x-auto"}`}>
         <div className="group flex flex-wrap gap-4 mt-4 w-max">
 
-          {nowPlayingMovies.length > 0 ?
+          {nowPlayingMovies?.length > 0 ?
 
             nowPlayingMovies.map((movie, index) => (
               <div

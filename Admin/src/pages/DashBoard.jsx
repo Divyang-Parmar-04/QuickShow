@@ -41,14 +41,27 @@ function DashBoard() {
     { title: 'Total Users', value: dashBoardData.totalUsers, icon: <Users className="w-6 h-6" /> },
   ];
 
-  const fetchMoviesByIds = async (ids) => {
-    const requests = ids.map(id =>
-      axios.get(`${BASE_URL}/movie/${id}?api_key=${API_KEY}`)
-    );
+  const fetchMoviesByIds = async (ids = []) => {
+    try {
+      if (!ids.length) return [];
 
-    const responses = await Promise.all(requests);
-    return responses.map(res => res.data);
+      const res = await axios.get(
+        `${import.meta.env.VITE_BACKEND_URL}/api/admin/tmdb/search/id`,
+        {
+          params: {
+            ids: ids.join(","), // ✅ IMPORTANT
+          },
+        }
+      );
+
+      return res.data.data || [];
+
+    } catch (error) {
+      console.error("Fetch by IDs error:", error);
+      return [];
+    }
   };
+
 
 
   const fetchDashBoardData = async () => {
@@ -56,9 +69,9 @@ function DashBoard() {
 
     try {
       const moviesIds = admin.theater?.movies.map((movie) => movie.movieId)
-      // console.log(moviesIds)
 
       const shows = await fetchMoviesByIds(moviesIds)
+
       const showsPoster = shows.map(m => ({
         poster: `https://image.tmdb.org/t/p/w500${m.poster_path}`,
         avg: m.vote_average
@@ -74,7 +87,8 @@ function DashBoard() {
         totalUsers: admin.theater?.total_user
       });
     } catch (error) {
-      alert("somthing went wrong")
+      alert(`somthing went wrong ${error}`)
+      console.log(error)
     }
     finally {
       setLoading(false);
@@ -150,7 +164,7 @@ function DashBoard() {
               <img
                 alt={`${show.movie_name} Poster`}
                 className="h-60 w-full object-contains"
-                src={shows[index].poster || '/images/default_poster.jpg'}
+                src={shows[index]?.poster || '/images/default_poster.jpg'}
               />
 
               <p className="font-medium p-2 truncate">{show.movie_name}</p>
@@ -159,7 +173,7 @@ function DashBoard() {
                 <p className="text-lg font-medium">{currency}{show?.show_price || 'N/A'}</p>
                 <p className="flex items-center gap-1 text-sm text-gray-400 mt-1 pr-1">
                   <Star className="w-4 h-4 text-primary fill-primary" />
-                  {shows[index].avg || 'N/A'}
+                  {shows[index]?.avg || 'N/A'}
                 </p>
               </div>
 

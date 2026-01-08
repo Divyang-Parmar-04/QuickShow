@@ -1,5 +1,6 @@
 const USER = require("../models/userModel")
 const THEATER = require("../models/theaterModel")
+const axios = require("axios")
 
 const API_KEY = process.env.TMDB_API_KEY;
 const BASE_URL = "https://api.themoviedb.org/3";
@@ -94,7 +95,7 @@ const getNowPlayingMovies = async (req, res) => {
 
   } catch (error) {
     console.log(error)
-    return res.json({ data: [], msg: error })
+    return res.json({ data: [], msg: "error" })
   }
 }
 

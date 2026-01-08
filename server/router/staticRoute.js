@@ -99,7 +99,7 @@ router.get("/api/admin/tmdb/search", async (req, res) => {
 
 router.get("/api/admin/tmdb/search/id", async (req, res) => {
   try {
-    const { ids } = req.body
+    const ids = req.query
 
     if (ids) {
       movies = await fetchMoviesByIds(ids);
